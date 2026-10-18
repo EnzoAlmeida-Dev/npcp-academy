@@ -1,8 +1,8 @@
 // Bootstrap do primeiro gerente.
 //
-// Uso (somente servidor/local; nunca em CI):
-//   node --env-file-if-exists=.env.development.local scripts/seed-manager.mjs \
-//     --email=gerente@exemplo.com --confirm
+// Uso:
+//   npm run seed:manager -- --email=gerente@exemplo.com --confirm        (nuvem)
+//   npm run seed:manager:local -- --email=gerente@exemplo.com --confirm  (local)
 //
 // Requisitos:
 //   - A conta de autenticacao (auth.users) ja deve existir.
@@ -47,6 +47,9 @@ if (!url || !serviceRoleKey) {
   );
   process.exit(1);
 }
+
+const isLocal = /^https?:\/\/(127\.0\.0\.1|localhost|\[::1\])(:\d+)?$/.test(url);
+console.log(`[seed-manager] alvo: ${isLocal ? "local" : "nuvem"}`);
 
 const supabase = createClient(url, serviceRoleKey, {
   auth: { autoRefreshToken: false, persistSession: false },

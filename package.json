@@ -2,15 +2,21 @@
   "name": "npcp-academy",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
-    "dev": "next dev",
+    "dev": "node scripts/dev.mjs",
+    "dev:next": "next dev",
+    "check:supabase": "node scripts/check-supabase.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "seed:manager": "node --env-file-if-exists=.env.development.local scripts/seed-manager.mjs"
+    "seed:manager": "node --env-file-if-exists=.env.local scripts/seed-manager.mjs",
+    "seed:manager:local": "node --env-file-if-exists=.env.development.local scripts/seed-manager.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

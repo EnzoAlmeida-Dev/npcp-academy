@@ -3,28 +3,48 @@ import "server-only";
 import { z } from "zod";
 
 /**
- * Variaveis exclusivas de servidor. Este modulo nunca deve ser importado
- * por codigo de cliente (o pacote `server-only` quebra o build se isso ocorrer).
+ * Configuracao de servidor que NAO exige privilegios elevados.
+ * A service-role key fica separada em getServiceRoleKey().
  */
-const serverEnvSchema = z.object({
-  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
+const appServerEnvSchema = z.object({
   INVITE_TTL_DAYS: z.coerce.number().int().positive(),
   APP_URL: z.string().url(),
 });
 
-export type ServerEnv = z.infer<typeof serverEnvSchema>;
+export type AppServerEnv = z.infer<typeof appServerEnvSchema>;
 
-let cachedServerEnv: ServerEnv | null = null;
-
-export function getServerEnv(): ServerEnv {
-  if (cachedServerEnv) {
-    return cachedServerEnv;
+/**
+ * Resolve a URL publica da aplicacao. Em producao no Vercel, usa as
+ * variaveis fornecidas pela plataforma caso APP_URL nao esteja definida.
+ */
+function resolveAppUrl(): string {
+  if (process.env.APP_URL) {
+    return process.env.APP_URL;
   }
 
-  const parsed = serverEnvSchema.safeParse({
-    SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
+  const productionUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  if (productionUrl) {
+    return `https://${productionUrl}`;
+  }
+
+  const deploymentUrl = process.env.VERCEL_URL;
+  if (deploymentUrl) {
+    return `https://${deploymentUrl}`;
+  }
+
+  return "http://localhost:3000";
+}
+
+let cachedAppServerEnv: AppServerEnv | null = null;
+
+export function getAppServerEnv(): AppServerEnv {
+  if (cachedAppServerEnv) {
+    return cachedAppServerEnv;
+  }
+
+  const parsed = appServerEnvSchema.safeParse({
     INVITE_TTL_DAYS: process.env.INVITE_TTL_DAYS ?? "7",
-    APP_URL: process.env.APP_URL ?? "http://localhost:3000",
+    APP_URL: resolveAppUrl(),
   });
 
   if (!parsed.success) {
@@ -33,6 +53,20 @@ export function getServerEnv(): ServerEnv {
     );
   }
 
-  cachedServerEnv = parsed.data;
-  return cachedServerEnv;
+  cachedAppServerEnv = parsed.data;
+  return cachedAppServerEnv;
+}
+
+/**
+ * Service-role key: EXCLUSIVA de servidor. Usada apenas por operacoes
+ * administrativas (bootstrap do primeiro gerente), nunca pelo fluxo de convites.
+ */
+export function getServiceRoleKey(): string {
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!key) {
+    throw new Error(
+      "SUPABASE_SERVICE_ROLE_KEY ausente. Esta chave e exclusiva de servidor.",
+    );
+  }
+  return key;
 }

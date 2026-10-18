@@ -13,6 +13,7 @@ Status: proposta para validação antes da implementação.
 7. `docs/decisions/ADR-001-STACK.md` — decisão tecnológica provisória.
 8. `docs/implementation/IMPLEMENTATION_PLAN.md` — fases e Definition of Done.
 9. `AGENTS.md` — instruções persistentes para o agente de código.
+10. `docs/implementation/ETAPA-1_HANDOFF.md` — registro de decisões e mudanças da Etapa 1 (continuidade/backup).
 
 ## Como usar com OpenCode
 - Coloque estes arquivos na raiz de um repositório novo ou copie-os para o repositório existente.
@@ -32,50 +33,84 @@ Stack: Next.js + TypeScript + Supabase (Auth/Postgres/RLS) + Tailwind. Testes co
 
 ### Requisitos
 
-- Node.js >= 22 (projeto usa Node 24)
-- Docker Desktop (para o Supabase local)
-- Supabase CLI (instalada como dependência de desenvolvimento: `npx supabase`)
+- Node.js >= 22 (o projeto declara `engines.node`; usa Node 24 localmente).
+- **Opcional:** Docker Desktop + Supabase CLI, apenas para o Supabase **local**.
+- Para a nuvem (recomendado para Vercel) não é necessário Docker.
+
+### Ambientes (local × nuvem)
+
+- `.env.local` — **alvo ativo** (nuvem ou local). Versão de referência: `.env.example`.
+- `.env.development.local` — override opcional do Supabase **local** (Docker).
+  É ignorado pelo Git.
+
+O comando `npm run dev` (`scripts/dev.mjs`) escolhe automaticamente:
+1. Se o Supabase **local** responder, usa `.env.development.local`.
+2. Caso contrário, se existir `.env.local`, usa a **nuvem** (fallback) — assim
+   "esquecer o Docker" não quebra o desenvolvimento.
+
+Diagnóstico: `npm run check:supabase` (mostra alvo e conectividade, sem expor valores).
+Para rodar o Next direto, sem o launcher: `npm run dev:next`.
 
 ### Configuração
 
 1. `npm install`
-2. Suba o Supabase local: `npx supabase start`
-3. Configure as variáveis de ambiente a partir de `supabase status`:
-   - Crie `.env.development.local` com `NEXT_PUBLIC_SUPABASE_URL`,
-     `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` e `SUPABASE_SERVICE_ROLE_KEY`
-     (valores locais; nunca versionar).
-   - Veja `.env.example` para a lista completa (inclui `INVITE_TTL_DAYS` e `APP_URL`).
-4. Aplique as migrações no banco **local**: `npx supabase migration up`
+2. Nuvem (recomendado): preencha `.env.local` com URL, publishable key,
+   `SUPABASE_SERVICE_ROLE_KEY` (apenas para bootstrap), `INVITE_TTL_DAYS` e `APP_URL`.
+3. Local (opcional): `npx supabase start` e crie `.env.development.local` com os
+   valores de `npx supabase status`; aplique migrações com `npx supabase migration up`.
 
 ### Bootstrap do primeiro gerente
 
-1. Crie a conta de autenticação do gerente (dashboard ou CLI do Supabase local).
-2. Execute, com confirmação explícita:
+- Nuvem: `npm run seed:manager -- --email=gerente@exemplo.com --confirm`
+- Local: `npm run seed:manager:local -- --email=gerente@exemplo.com --confirm`
 
-   `npm run seed:manager -- --email=gerente@exemplo.com --confirm`
-
-   O script é idempotente, exige `--confirm`, valida exatamente uma conta e nunca
-   imprime segredos. Não roda em CI.
+O script é idempotente, exige `--confirm`, valida exatamente uma conta, informa se
+o alvo é local/nuvem e nunca imprime segredos. Não roda em CI.
 
 ### Comandos
 
-- `npm run dev` — servidor de desenvolvimento.
-- `npm run build` — build de produção.
-- `npm run lint` — ESLint.
-- `npm run typecheck` — `tsc --noEmit`.
-- `npm test` — Vitest (uma execução).
-- `npm run test:watch` — Vitest em modo watch.
+- `npm run dev` — dev com seleção automática de ambiente.
+- `npm run dev:next` — dev sem o launcher.
+- `npm run check:supabase` — conectividade dos ambientes.
+- `npm run build` / `npm run start` — produção.
+- `npm run lint` / `npm run typecheck` / `npm test` / `npm run test:watch`.
 
 ### Migrações e seeds
 
 - Migrações em `supabase/migrations/` (versionadas).
 - Seed fictício em `supabase/seed.sql` (sem dados reais).
-- Tipos do banco gerados com `npx supabase gen types typescript --local`.
+- Tipos do banco: `npx supabase gen types typescript --local`.
+- **Nuvem:** aplicar migrações exige identificar e confirmar o alvo
+  (`npx supabase link --project-ref <ref>` + `npx supabase db push`).
+  Nunca execute `db reset --linked`.
+
+### Vercel (hospedagem gratuita)
+
+O app é um Next.js padrão e não usa Docker em runtime. No painel do Vercel:
+
+1. Importe o repositório (Framework: Next.js; plano Hobby/gratuito).
+2. Configure as Environment Variables (produção):
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY` (server-only; só para bootstrap)
+   - `INVITE_TTL_DAYS` (ex.: `7`)
+   - `APP_URL` = URL do deploy (ex.: `https://seu-projeto.vercel.app`)
+     (se omitido, o app usa `VERCEL_PROJECT_PRODUCTION_URL`/`VERCEL_URL`).
+3. No projeto Supabase **em nuvem**:
+   - Habilite **confirmação de e-mail**.
+   - Adicione a URL do deploy à **allowlist de redirects**.
+   - Aplique as migrações no projeto correto.
+   - Configure SMTP para e-mails (o serviço padrão do Supabase tem limite baixo;
+     para um piloto, use um SMTP próprio, ex.: Resend).
+
+Observações de custo/limites: Vercel Hobby é gratuito para uso não comercial;
+o Supabase gratuito pode pausar por inatividade e tem limite de e-mails. Nenhum
+serviço local (Docker/CLI) é necessário para o app rodar no Vercel.
 
 ### Segurança
 
 - `SUPABASE_SERVICE_ROLE_KEY` é **exclusiva de servidor**: nunca use `NEXT_PUBLIC_*`
   para segredos, nunca versionar, nunca logar.
-- `src/lib/supabase/admin.ts` é protegido com `server-only`.
+- `src/lib/supabase/admin.ts` e `src/lib/env.server.ts` são protegidos com `server-only`.
 - Nunca execute `db push`/`db reset` em ambiente remoto sem autorização explícita
   e identificação do alvo. Nunca execute `db reset --linked`.

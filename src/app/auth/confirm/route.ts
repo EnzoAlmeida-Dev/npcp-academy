@@ -15,6 +15,7 @@ const otpTypes = [
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
+  const code = searchParams.get("code");
   const tokenHash = searchParams.get("token_hash");
   const rawType = searchParams.get("type");
 
@@ -47,23 +48,45 @@ export async function GET(request: NextRequest) {
     },
   );
 
-  if (tokenHash && rawType && (otpTypes as readonly string[]).includes(rawType)) {
+  let inviteToken: string | null = null;
+  let failed = false;
+
+  if (code) {
+    // Fluxo PKCE: o GoTrue redireciona com ?code= apos confirmar o e-mail.
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+    if (error) {
+      failed = true;
+    } else {
+      const value = data.user?.user_metadata?.invite_token;
+      inviteToken = typeof value === "string" && value.length > 0 ? value : null;
+    }
+  } else if (
+    tokenHash &&
+    rawType &&
+    (otpTypes as readonly string[]).includes(rawType)
+  ) {
+    // Fluxo alternativo: link com token_hash + type.
     const { data, error } = await supabase.auth.verifyOtp({
       token_hash: tokenHash,
       type: rawType as (typeof otpTypes)[number],
     });
-
     if (error) {
-      return NextResponse.redirect(new URL("/login?error=confirm", request.url));
+      failed = true;
+    } else {
+      const value = data.user?.user_metadata?.invite_token;
+      inviteToken = typeof value === "string" && value.length > 0 ? value : null;
     }
+  }
 
-    const inviteToken = data.user?.user_metadata?.invite_token;
-    if (typeof inviteToken === "string" && inviteToken.length > 0) {
-      response.headers.set(
-        "Location",
-        new URL(`/invite/${inviteToken}`, request.url).toString(),
-      );
-    }
+  if (failed) {
+    return NextResponse.redirect(new URL("/login?error=confirm", request.url));
+  }
+
+  if (inviteToken) {
+    response.headers.set(
+      "Location",
+      new URL(`/invite/${inviteToken}`, request.url).toString(),
+    );
   }
 
   return response;

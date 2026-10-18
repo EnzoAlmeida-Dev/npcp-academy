@@ -5,7 +5,7 @@ import { z } from "zod";
 
 import type { ActionState } from "@/lib/action-state";
 import { requireRole } from "@/lib/auth/authorize";
-import { getServerEnv } from "@/lib/env.server";
+import { getAppServerEnv } from "@/lib/env.server";
 import { createClient } from "@/lib/supabase/server";
 
 import { getInvitationInfo } from "./info";
@@ -35,7 +35,7 @@ export async function createInvitationAction(
 
   const token = generateInviteToken();
   const tokenHash = hashToken(token);
-  const ttlDays = getServerEnv().INVITE_TTL_DAYS;
+  const ttlDays = getAppServerEnv().INVITE_TTL_DAYS;
   const expiresAt = new Date(
     Date.now() + ttlDays * 24 * 60 * 60 * 1000,
   ).toISOString();
@@ -57,7 +57,7 @@ export async function createInvitationAction(
 
   return {
     success: true,
-    inviteUrl: `${getServerEnv().APP_URL}/invite/${token}`,
+    inviteUrl: `${getAppServerEnv().APP_URL}/invite/${token}`,
   };
 }
 
@@ -122,7 +122,7 @@ export async function signUpForInviteAction(
         display_name: parsed.data.display_name?.trim() ?? "",
         invite_token: parsed.data.token,
       },
-      emailRedirectTo: `${getServerEnv().APP_URL}/auth/confirm`,
+      emailRedirectTo: `${getAppServerEnv().APP_URL}/auth/confirm`,
     },
   });
 

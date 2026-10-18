@@ -6,7 +6,7 @@
 // Recusa executar contra qualquer host que nao seja local (seguranca).
 // Cria usuarios de teste com e-mails *.example.test e os remove ao final.
 
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -37,6 +37,17 @@ function asUser(accessToken) {
 }
 
 async function createConfirmedUser(email) {
+  const { data: listData } = await admin.auth.admin.listUsers({
+    page: 1,
+    perPage: 1000,
+  });
+  const existing = (listData?.users ?? []).filter(
+    (u) => (u.email ?? "").toLowerCase() === email.toLowerCase(),
+  );
+  for (const user of existing) {
+    await admin.auth.admin.deleteUser(user.id).catch(() => {});
+  }
+
   const { data, error } = await admin.auth.admin.createUser({
     email,
     password: "senha-teste-123",
@@ -88,7 +99,7 @@ try {
 
   const managerToken = await signIn("e2e-manager@example.test");
   const managerClient = asUser(managerToken);
-  const inviteToken = "tok-e2e-valid";
+  const inviteToken = `tok-e2e-valid-${randomUUID()}`;
   const { error: insertErr } = await managerClient.from("invitations").insert({
     email_normalized: "e2e-member@example.test",
     token_hash: hash(inviteToken),
@@ -140,7 +151,7 @@ try {
     createConfirmedUser("e2e-race2@example.test"),
   ]);
   created.push(u1.id, u2.id);
-  const raceToken = "tok-e2e-race";
+  const raceToken = `tok-e2e-race-${randomUUID()}`;
   await managerClient.from("invitations").insert({
     email_normalized: "e2e-race@example.test",
     token_hash: hash(raceToken),
@@ -175,5 +186,13 @@ try {
   );
   if (failed.length) process.exitCode = 1;
 } finally {
+  try {
+    await admin
+      .from("invitations")
+      .delete()
+      .like("email_normalized", "%@example.test");
+  } catch {
+    // limpeza best-effort
+  }
   await cleanup(created);
 }

@@ -2,6 +2,11 @@
 
 Priorizar decisões que bloqueiam o desenho de dados ou segurança.
 
+> Rastreabilidade: os rótulos `D10–D21` usados em
+> `docs/implementation/ETAPA-1_HANDOFF.md` correspondem aos itens numerados
+> abaixo (ex.: D10 = item 5, D11 = item 6, D13 = item 8, D15 = item 10,
+> D17 = item 13, D19 = item 15, D20 = item 12, D21 = item 16).
+
 ## Antes da implementação de autenticação
 1. Como a gerência será criada inicialmente com segurança?
 2. O convite será enviado por e-mail automaticamente ou criado/copiar link manualmente no MVP?
