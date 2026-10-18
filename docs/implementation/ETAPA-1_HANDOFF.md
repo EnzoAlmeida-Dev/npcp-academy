@@ -12,6 +12,21 @@
 
 ---
 
+## 0. Atualização pós-deploy (nuvem)
+
+- Projeto Supabase em nuvem linkado: `vzkhvbygaodtrmhsputz` (`npcp-academy`, São Paulo).
+- Migrações aplicadas na nuvem: **5/5** (`migration list --linked` confere).
+- Ambiente em modo **cloud-only**: `.env.development.local.disabled`; `.env.local`
+  com URL, publishable key, service-role, `APP_URL` e `INVITE_TTL_DAYS`.
+- Primeiro manager criado via `seed:manager` (idempotente); conta confirmada e
+  perfil `manager` ativado.
+- Confirmação de e-mail habilitada e redirect URLs configuradas no dashboard.
+- **Pendente:** configurar SMTP próprio e validar o fluxo de convite com e-mail real.
+- `scripts/seed-manager.mjs` passou a criar a conta de auth quando ela não existe,
+  usando `MANAGER_PASSWORD` temporária (nunca impressa).
+
+---
+
 ## 1. Resumo executivo
 
 A Etapa 1 entregou a fundação do projeto e a fatia vertical de identidade e

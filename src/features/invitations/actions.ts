@@ -127,6 +127,24 @@ export async function signUpForInviteAction(
   });
 
   if (error) {
+    // Log server-side para diagnostico (nao expoe segredos ao cliente).
+    console.error(
+      "[signup] Supabase retornou erro:",
+      error.status ?? "n/a",
+      error.message,
+    );
+
+    if (
+      error.status === 429 ||
+      /rate limit/i.test(error.message) ||
+      /email.*limit/i.test(error.message)
+    ) {
+      return {
+        error:
+          "Muitas tentativas de e-mail. Aguarde alguns minutos ou configure o SMTP e tente novamente.",
+      };
+    }
+
     return { error: "Não foi possível criar a conta." };
   }
 

@@ -5,8 +5,10 @@
 //   npm run seed:manager:local -- --email=gerente@exemplo.com --confirm  (local)
 //
 // Requisitos:
-//   - A conta de autenticacao (auth.users) ja deve existir.
 //   - SUPABASE_SERVICE_ROLE_KEY e NEXT_PUBLIC_SUPABASE_URL devem estar no ambiente.
+//   - Se a conta de autenticacao ainda NAO existir, defina MANAGER_PASSWORD
+//     temporariamente (ex.: no .env.local) apenas durante o bootstrap; remova depois.
+//     A senha nunca e impressa.
 //   - O parametro --confirm e obrigatorio (evita execucao acidental).
 //   - Nao imprime segredos em nenhuma circunstancia.
 
@@ -69,17 +71,37 @@ const matches = (usersData?.users ?? []).filter(
   (u) => (u.email ?? "").toLowerCase() === normalizedEmail,
 );
 
-if (matches.length === 0) {
-  console.error(`Nenhum usuario de autenticacao encontrado para ${args.email}.`);
-  process.exit(1);
-}
+let user;
 
-if (matches.length > 1) {
+if (matches.length === 0) {
+  const password = process.env.MANAGER_PASSWORD;
+  if (!password) {
+    console.error(
+      `Nenhum usuario de autenticacao encontrado para ${args.email}. ` +
+        "Crie a conta no dashboard ou defina MANAGER_PASSWORD temporariamente.",
+    );
+    process.exit(1);
+  }
+
+  const { data, error } = await supabase.auth.admin.createUser({
+    email: args.email,
+    password,
+    email_confirm: true,
+  });
+
+  if (error) {
+    console.error("Erro ao criar usuario de autenticacao:", error.message);
+    process.exit(1);
+  }
+
+  user = data.user;
+  console.log(`Conta de autenticacao criada para ${args.email}.`);
+} else if (matches.length > 1) {
   console.error(`Mais de um usuario encontrado para ${args.email}. Abortando.`);
   process.exit(1);
+} else {
+  user = matches[0];
 }
-
-const user = matches[0];
 
 const { data: existing, error: profileError } = await supabase
   .from("profiles")
