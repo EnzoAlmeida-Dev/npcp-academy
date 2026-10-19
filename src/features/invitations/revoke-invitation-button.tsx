@@ -2,8 +2,10 @@
 
 import { useActionState } from "react";
 
-import type { ActionState } from "@/lib/action-state";
+import { Button } from "@/components/ui/button";
+import { FormMessage } from "@/components/ui/form-message";
 import { revokeInvitationAction } from "@/features/invitations/actions";
+import type { ActionState } from "@/lib/action-state";
 
 const initialState: ActionState = {};
 
@@ -16,17 +18,11 @@ export function RevokeInvitationButton({ id }: { id: string }) {
   return (
     <form action={formAction} className="inline">
       <input type="hidden" name="id" value={id} />
-      <button
-        type="submit"
-        disabled={pending}
-        className="text-sm text-red-700 underline disabled:opacity-60"
-      >
+      <Button type="submit" variant="danger" disabled={pending}>
         {pending ? "Revogando..." : "Revogar"}
-      </button>
+      </Button>
       {state.error ? (
-        <p role="alert" className="text-sm text-red-600">
-          {state.error}
-        </p>
+        <FormMessage className="mt-1">{state.error}</FormMessage>
       ) : null}
     </form>
   );

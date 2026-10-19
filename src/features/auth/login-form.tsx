@@ -2,8 +2,12 @@
 
 import { useActionState } from "react";
 
-import type { ActionState } from "@/lib/action-state";
+import { Button } from "@/components/ui/button";
+import { FormMessage } from "@/components/ui/form-message";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { loginAction } from "@/features/auth/actions";
+import type { ActionState } from "@/lib/action-state";
 
 const initialState: ActionState = {};
 
@@ -11,44 +15,34 @@ export function LoginForm() {
   const [state, formAction, pending] = useActionState(loginAction, initialState);
 
   return (
-    <form action={formAction} className="flex w-full max-w-sm flex-col gap-3">
-      <div className="flex flex-col gap-1">
-        <label htmlFor="email">E-mail</label>
-        <input
+    <form action={formAction} className="flex flex-col gap-4">
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="email">E-mail</Label>
+        <Input
           id="email"
           name="email"
           type="email"
           autoComplete="email"
           required
-          className="rounded border px-3 py-2"
         />
       </div>
 
-      <div className="flex flex-col gap-1">
-        <label htmlFor="password">Senha</label>
-        <input
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="password">Senha</Label>
+        <Input
           id="password"
           name="password"
           type="password"
           autoComplete="current-password"
           required
-          className="rounded border px-3 py-2"
         />
       </div>
 
-      {state.error ? (
-        <p role="alert" className="text-sm text-red-600">
-          {state.error}
-        </p>
-      ) : null}
+      <FormMessage>{state.error}</FormMessage>
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="rounded bg-zinc-900 px-3 py-2 text-white disabled:opacity-60"
-      >
+      <Button type="submit" disabled={pending}>
         {pending ? "Entrando..." : "Entrar"}
-      </button>
+      </Button>
     </form>
   );
 }

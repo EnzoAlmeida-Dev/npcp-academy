@@ -6,12 +6,21 @@
 
 Este documento é a fonte única para as decisões de design visual e UX/UI da
 plataforma. A interface deve ser clara, discreta e funcional, priorizando
-legibilidade, consistência e acessibilidade sobre efeitos visuais./plan
+legibilidade, consistência e acessibilidade sobre efeitos visuais.
+
+## Implementação atual (Etapa de design)
+
+- Tokens de cor, raio e sombra aplicados em `src/app/globals.css` (Tailwind v4 `@theme`).
+- Fontes **Poppins** (títulos) e **Questrial** (corpo) carregadas via `next/font/google`.
+- Componentes base em `src/components/ui/` (Button, Input, Select, Label, FormMessage,
+  Card, Badge, StatusPanel, EmptyState, PageHeader).
+- App shell com navegação por papel em `src/components/app-shell/` (sidebar desktop,
+  header/menu mobile), config em `src/lib/navigation.ts`.
+- Marca exibida como texto “NPCP Academy” até a definição do logo oficial.
 
 ## Princípios
 
-- Plataforma interna de capacitação profissional, com hierarquia visual clara.
-- Componentes reutilizáveis, previsíveis e com estados explícitos.
+- Plataforma interna de capacitação profissional, com hierarquia visual clara.- Componentes reutilizáveis, previsíveis e com estados explícitos.
 - A interface não é mecanismo de segurança: autorização continua no servidor e
   no banco de dados.
 - Nunca comunicar estado apenas por cor; combinar cor com texto, ícone ou forma.

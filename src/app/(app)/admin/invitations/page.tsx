@@ -1,3 +1,7 @@
+import { Badge, type BadgeTone } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
+import { PageHeader } from "@/components/ui/page-header";
 import { CreateInvitationForm } from "@/features/invitations/create-invitation-form";
 import { listInvitations } from "@/features/invitations/queries";
 import { RevokeInvitationButton } from "@/features/invitations/revoke-invitation-button";
@@ -8,24 +12,24 @@ function invitationStatus(inv: {
   used_at: string | null;
   revoked_at: string | null;
   expires_at: string;
-}): string {
+}): { label: string; tone: BadgeTone } {
   if (inv.used_at) {
-    return "utilizado";
+    return { label: "Utilizado", tone: "neutral" };
   }
   if (inv.revoked_at) {
-    return "revogado";
+    return { label: "Revogado", tone: "danger" };
   }
   if (new Date(inv.expires_at).getTime() <= Date.now()) {
-    return "expirado";
+    return { label: "Expirado", tone: "warning" };
   }
-  return "aguardando";
+  return { label: "Aguardando", tone: "info" };
 }
 
 export default async function AdminInvitationsPage() {
   const manager = await requireRole("manager");
   if (!manager) {
     return (
-      <p role="alert" className="text-sm text-red-600">
+      <p role="alert" className="text-sm text-danger">
         Sem permissão para acessar esta página.
       </p>
     );
@@ -35,31 +39,46 @@ export default async function AdminInvitationsPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-semibold">Convites</h1>
+      <PageHeader
+        title="Convites"
+        description="Crie e gerencie convites de acesso."
+      />
 
       <CreateInvitationForm />
 
-      <ul className="flex flex-col gap-2">
-        {invitations.length === 0 ? (
-          <li className="text-sm text-zinc-600">Nenhum convite criado.</li>
-        ) : null}
-        {invitations.map((inv) => (
-          <li
-            key={inv.id}
-            className="flex items-center justify-between gap-4 rounded border px-4 py-2"
-          >
-            <div className="flex flex-col">
-              <span className="font-medium">{inv.email_normalized}</span>
-              <span className="text-sm text-zinc-600">
-                {ROLE_LABELS[inv.role]} · {invitationStatus(inv)}
-              </span>
-            </div>
-            {inv.used_at === null && inv.revoked_at === null ? (
-              <RevokeInvitationButton id={inv.id} />
-            ) : null}
-          </li>
-        ))}
-      </ul>
+      {invitations.length === 0 ? (
+        <EmptyState
+          title="Nenhum convite"
+          description="Crie o primeiro convite acima."
+        />
+      ) : (
+        <Card className="overflow-hidden p-0">
+          <ul className="divide-y divide-border">
+            {invitations.map((inv) => {
+              const status = invitationStatus(inv);
+              return (
+                <li
+                  key={inv.id}
+                  className="flex items-center justify-between gap-4 px-4 py-3"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate font-medium text-ink">
+                      {inv.email_normalized}
+                    </p>
+                    <p className="text-sm text-muted">{ROLE_LABELS[inv.role]}</p>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-2">
+                    <Badge tone={status.tone}>{status.label}</Badge>
+                    {inv.used_at === null && inv.revoked_at === null ? (
+                      <RevokeInvitationButton id={inv.id} />
+                    ) : null}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </Card>
+      )}
     </div>
   );
 }

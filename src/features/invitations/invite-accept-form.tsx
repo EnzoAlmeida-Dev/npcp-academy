@@ -2,8 +2,14 @@
 
 import { useActionState } from "react";
 
-import type { ActionState } from "@/lib/action-state";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { FormMessage } from "@/components/ui/form-message";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { StatusPanel } from "@/components/ui/status-panel";
 import { signUpForInviteAction } from "@/features/invitations/actions";
+import type { ActionState } from "@/lib/action-state";
 
 const initialState: ActionState = {};
 
@@ -21,61 +27,51 @@ export function InviteAcceptForm({
 
   if (state.success) {
     return (
-      <div className="flex w-full max-w-sm flex-col gap-3 rounded border p-6">
-        <p className="font-medium">Confirme seu e-mail</p>
-        <p className="text-sm text-zinc-600">
-          Enviamos um link de confirmação para <strong>{email}</strong>. Abra o
-          e-mail e clique no link para concluir o cadastro.
-        </p>
-      </div>
+      <StatusPanel
+        title="Confirme seu e-mail"
+        message={`Enviamos um link de confirmação para ${email}. Abra o e-mail e clique no link para concluir o cadastro.`}
+        tone="success"
+      />
     );
   }
 
   return (
-    <form action={formAction} className="flex w-full max-w-sm flex-col gap-3">
-      <input type="hidden" name="token" value={token} />
+    <Card>
+      <h1 className="mb-6 text-center font-heading text-2xl font-bold text-secondary">
+        Aceitar convite
+      </h1>
 
-      <div className="flex flex-col gap-1">
-        <span className="text-sm text-zinc-500">E-mail convidado</span>
-        <span className="font-medium">{email}</span>
-      </div>
+      <form action={formAction} className="flex flex-col gap-4">
+        <input type="hidden" name="token" value={token} />
 
-      <div className="flex flex-col gap-1">
-        <label htmlFor="display_name">Nome de exibição (opcional)</label>
-        <input
-          id="display_name"
-          name="display_name"
-          maxLength={120}
-          className="rounded border px-3 py-2"
-        />
-      </div>
+        <div className="flex flex-col gap-1">
+          <span className="text-sm text-muted">E-mail convidado</span>
+          <span className="font-medium text-ink">{email}</span>
+        </div>
 
-      <div className="flex flex-col gap-1">
-        <label htmlFor="password">Senha</label>
-        <input
-          id="password"
-          name="password"
-          type="password"
-          autoComplete="new-password"
-          required
-          minLength={6}
-          className="rounded border px-3 py-2"
-        />
-      </div>
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="display_name">Nome de exibição (opcional)</Label>
+          <Input id="display_name" name="display_name" maxLength={120} />
+        </div>
 
-      {state.error ? (
-        <p role="alert" className="text-sm text-red-600">
-          {state.error}
-        </p>
-      ) : null}
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="password">Senha</Label>
+          <Input
+            id="password"
+            name="password"
+            type="password"
+            autoComplete="new-password"
+            required
+            minLength={6}
+          />
+        </div>
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="rounded bg-zinc-900 px-3 py-2 text-white disabled:opacity-60"
-      >
-        {pending ? "Criando..." : "Criar conta"}
-      </button>
-    </form>
+        <FormMessage>{state.error}</FormMessage>
+
+        <Button type="submit" disabled={pending}>
+          {pending ? "Criando..." : "Criar conta"}
+        </Button>
+      </form>
+    </Card>
   );
 }

@@ -2,8 +2,14 @@
 
 import { useActionState } from "react";
 
-import type { ActionState } from "@/lib/action-state";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { FormMessage } from "@/components/ui/form-message";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select } from "@/components/ui/select";
 import { createInvitationAction } from "@/features/invitations/actions";
+import type { ActionState } from "@/lib/action-state";
 
 const initialState: ActionState = {};
 
@@ -14,62 +20,47 @@ export function CreateInvitationForm() {
   );
 
   return (
-    <form
-      action={formAction}
-      className="flex w-full max-w-xl flex-col gap-3 rounded border p-4"
-    >
-      <div className="flex flex-col gap-1">
-        <label htmlFor="email">E-mail do convidado</label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          required
-          className="rounded border px-3 py-2"
-        />
-      </div>
+    <Card>
+      <form
+        action={formAction}
+        className="flex flex-col gap-4 sm:flex-row sm:items-end"
+      >
+        <div className="flex flex-1 flex-col gap-1.5">
+          <Label htmlFor="email">E-mail do convidado</Label>
+          <Input id="email" name="email" type="email" required />
+        </div>
 
-      <div className="flex flex-col gap-1">
-        <label htmlFor="role">Papel</label>
-        <select
-          id="role"
-          name="role"
-          defaultValue="member"
-          className="rounded border px-3 py-2"
-        >
-          <option value="member">Membro</option>
-          <option value="reviewer">Responsável técnico</option>
-          <option value="manager">Gerência</option>
-        </select>
-      </div>
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="role">Papel</Label>
+          <Select id="role" name="role" defaultValue="member">
+            <option value="member">Membro</option>
+            <option value="reviewer">Responsável técnico</option>
+            <option value="manager">Gerência</option>
+          </Select>
+        </div>
+
+        <Button type="submit" disabled={pending}>
+          {pending ? "Criando..." : "Criar convite"}
+        </Button>
+      </form>
 
       {state.error ? (
-        <p role="alert" className="text-sm text-red-600">
-          {state.error}
-        </p>
+        <FormMessage className="mt-3">{state.error}</FormMessage>
       ) : null}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="rounded bg-zinc-900 px-3 py-2 text-white disabled:opacity-60"
-      >
-        {pending ? "Criando..." : "Criar convite"}
-      </button>
-
       {state.inviteUrl ? (
-        <div className="flex flex-col gap-1 rounded border border-green-200 bg-green-50 p-3">
-          <span className="text-sm font-medium">
+        <div className="mt-3 rounded-lg border border-success/30 bg-success/10 p-3">
+          <p className="text-sm font-medium text-success">
             Link de convite (copie e envie):
-          </span>
+          </p>
           <a
             href={state.inviteUrl}
-            className="break-all text-sm text-blue-700 underline"
+            className="break-all text-sm text-info underline"
           >
             {state.inviteUrl}
           </a>
         </div>
       ) : null}
-    </form>
+    </Card>
   );
 }
