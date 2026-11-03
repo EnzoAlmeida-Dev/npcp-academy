@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+
 import { Badge, type BadgeTone } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -6,6 +8,7 @@ import { CreateInvitationForm } from "@/features/invitations/create-invitation-f
 import { listInvitations } from "@/features/invitations/queries";
 import { RevokeInvitationButton } from "@/features/invitations/revoke-invitation-button";
 import { requireRole } from "@/lib/auth/authorize";
+import { formatDate } from "@/lib/format";
 import { ROLE_LABELS } from "@/lib/auth/roles";
 
 function invitationStatus(inv: {
@@ -24,6 +27,8 @@ function invitationStatus(inv: {
   }
   return { label: "Aguardando", tone: "info" };
 }
+
+export const metadata: Metadata = { title: "Convites" };
 
 export default async function AdminInvitationsPage() {
   const manager = await requireRole("manager");
@@ -59,18 +64,25 @@ export default async function AdminInvitationsPage() {
               return (
                 <li
                   key={inv.id}
-                  className="flex items-center justify-between gap-4 px-4 py-3"
+                  className="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
                 >
                   <div className="min-w-0">
                     <p className="truncate font-medium text-ink">
                       {inv.email_normalized}
                     </p>
-                    <p className="text-sm text-muted">{ROLE_LABELS[inv.role]}</p>
+                    <p className="text-sm text-muted">
+                      {ROLE_LABELS[inv.role]} · criado em{" "}
+                      {formatDate(inv.created_at)} · válido até{" "}
+                      {formatDate(inv.expires_at)}
+                    </p>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
                     <Badge tone={status.tone}>{status.label}</Badge>
                     {inv.used_at === null && inv.revoked_at === null ? (
-                      <RevokeInvitationButton id={inv.id} />
+                      <RevokeInvitationButton
+                        id={inv.id}
+                        email={inv.email_normalized}
+                      />
                     ) : null}
                   </div>
                 </li>

@@ -4,6 +4,7 @@ import { useActionState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { CopyButton } from "@/components/ui/copy-button";
 import { FormMessage } from "@/components/ui/form-message";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -51,14 +52,18 @@ export function CreateInvitationForm() {
       {state.inviteUrl ? (
         <div className="mt-3 rounded-lg border border-success/30 bg-success/10 p-3">
           <p className="text-sm font-medium text-success">
-            Link de convite (copie e envie):
+            Convite criado. Copie o link e envie à pessoa convidada.
           </p>
-          <a
-            href={state.inviteUrl}
-            className="break-all text-sm text-info underline"
-          >
+          <p className="mt-1 break-all rounded bg-surface px-2 py-1 text-sm text-ink">
             {state.inviteUrl}
-          </a>
+          </p>
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <CopyButton value={state.inviteUrl} />
+          </div>
+          <p className="mt-2 text-xs text-muted">
+            Este link é exibido apenas agora e não pode ser recuperado depois.
+            Se perdê-lo, revogue o convite e crie outro.
+          </p>
         </div>
       ) : null}
     </Card>

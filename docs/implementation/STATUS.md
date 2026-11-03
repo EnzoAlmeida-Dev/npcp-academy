@@ -43,16 +43,18 @@ Ver seção "Implementado" de `docs/architecture/DATA_MODEL.md`.
 | `20261018090000_admin_list_users` | RPC `list_users_for_admin` |
 
 ### UI
-Design system (tokens, fontes, componentes base, app shell responsivo). Ver `docs/design/DESIGN_SYSTEM.md`.
+Design system (tokens, fontes, componentes base, app shell responsivo, ícones Lucide, estados de página, diálogo de confirmação). Ver `docs/design/DESIGN_SYSTEM.md`.
+
+Revisão de UI/UX em 2026-11-03: foco visível em superfícies escuras, bordas de campo e texto secundário com contraste AA, `<nav>` e link "pular para o conteúdo", sidebar fixa, títulos por página, mensagem de erro de confirmação no login, `loading`/`error`/`not-found`, confirmação ao revogar convite, botão de copiar link, mostrar/ocultar senha e datas nas listas administrativas. Fora do escopo desta revisão (dependem da Fase 2b): nome de exibição obrigatório (D28), "Esqueci a senha" (D8) e ações em `/admin/users`.
 
 ## Testes
 | Tipo | Conteúdo | Como rodar |
 |---|---|---|
-| Unitários/componente (Vitest) | 13 testes: smoke node/jsdom, hierarquia de papéis, token de convite, navegação por papel | `npm test` |
+| Unitários/componente (Vitest) | 43 testes: smoke node/jsdom, hierarquia de papéis, token de convite, navegação por papel, contraste dos tokens, formatação de data, `ConfirmDialog`, `PasswordInput`, `CopyButton` | `npm test` |
 | E2E manual — RLS e convite | 6 verificações: RLS de convite, consumo válido, reuso rejeitado, member bloqueado, e-mail divergente | `node --env-file-if-exists=.env.development.local scripts/e2e-smoke.mjs` (Supabase local) |
 | E2E manual — e-mail | 9 verificações: cadastro exige confirmação, e-mail no Mailpit, confirmação, consumo, ativação | `scripts/e2e-invite-email.mjs` (Supabase local) |
 
-Última execução registrada: lint, typecheck e `npm test` OK em 2026-11-03; build e scripts E2E em 2026-10-18.
+Última execução registrada: lint, typecheck, `npm test` (43/43) e `npm run build` OK em 2026-11-03; verificação em execução (`/login`, `/login?error=confirm`, 404, redirecionamento sem sessão) OK. Scripts E2E: 2026-10-18. Telas autenticadas não foram inspecionadas em navegador nesta revisão.
 
 ### Cobertura de critérios de aceitação
 | AC | Estado |
@@ -61,7 +63,8 @@ Design system (tokens, fontes, componentes base, app shell responsivo). Ver `doc
 | AC-03 | Implementado (app shell redireciona sem perfil ativo); sem teste automatizado |
 | AC-04 | Implementado para convites e usuários (servidor + RLS); teste negativo de RLS só no script E2E |
 | AC-05 | Implementado (`server-only`, sem `NEXT_PUBLIC_` em segredos); sem verificação automatizada do bundle |
-| AC-37 | Parcial (app shell responsivo) |
+| AC-37 | Parcial (app shell responsivo; sem teste em navegador) |
+| AC-38 | Parcial (estados vazio, carregando, erro e 404 existem; sem cobertura automatizada de página) |
 | AC-40 | README atualizado |
 | Demais | Não implementados |
 

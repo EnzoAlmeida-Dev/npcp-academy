@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { FormMessage } from "@/components/ui/form-message";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/ui/password-input";
 import { StatusPanel } from "@/components/ui/status-panel";
 import { signUpForInviteAction } from "@/features/invitations/actions";
 import type { ActionState } from "@/lib/action-state";
@@ -56,14 +57,17 @@ export function InviteAcceptForm({
 
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="password">Senha</Label>
-          <Input
+          <PasswordInput
             id="password"
             name="password"
-            type="password"
             autoComplete="new-password"
             required
             minLength={6}
+            aria-describedby="password-hint"
           />
+          <p id="password-hint" className="text-xs text-muted">
+            Mínimo de 6 caracteres.
+          </p>
         </div>
 
         <FormMessage>{state.error}</FormMessage>

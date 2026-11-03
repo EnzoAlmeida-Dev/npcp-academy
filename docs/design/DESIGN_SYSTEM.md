@@ -12,11 +12,20 @@ legibilidade, consistência e acessibilidade sobre efeitos visuais.
 
 - Tokens de cor, raio e sombra aplicados em `src/app/globals.css` (Tailwind v4 `@theme`).
 - Fontes **Poppins** (títulos) e **Questrial** (corpo) carregadas via `next/font/google`.
-- Componentes base em `src/components/ui/` (Button, Input, Select, Label, FormMessage,
-  Card, Badge, StatusPanel, EmptyState, PageHeader).
-- App shell com navegação por papel em `src/components/app-shell/` (sidebar desktop,
-  header/menu mobile), config em `src/lib/navigation.ts`.
-- Marca exibida como texto “NPCP Academy” até a definição do logo oficial.
+- Componentes base em `src/components/ui/`: Button, Input, PasswordInput, Select, Label,
+  FormMessage, Card, Badge, StatusPanel, EmptyState, ErrorState, LoadingState,
+  ConfirmDialog, CopyButton, PageHeader.
+- App shell com navegação por papel em `src/components/app-shell/` (sidebar fixa no
+  desktop, header/menu mobile, link "Pular para o conteúdo", `<nav>` com rótulo),
+  config em `src/lib/navigation.ts`.
+- Ícones: **Lucide** (`lucide-react`), importando apenas os ícones usados (tree-shaking).
+  Ícones são decorativos (`aria-hidden`) e sempre acompanhados de texto ou de
+  `sr-only`.
+- Estados de rota na área autenticada: `loading.tsx`, `error.tsx`; `not-found.tsx` global.
+- Títulos por página via `metadata` (`%s · NPCP Academy`).
+- Marca exibida como texto “NPCP Academy” até a definição do logo oficial (sem logo ainda).
+- Contrastes verificados por `src/lib/contrast.test.ts`, que lê os tokens de
+  `globals.css`; alterar uma cor que viole o mínimo quebra o teste.
 
 ## Princípios
 
@@ -39,13 +48,22 @@ legibilidade, consistência e acessibilidade sobre efeitos visuais.
 | `surface` | `#FFFFFF` | Cards, modais, campos e superfícies elevadas |
 | `canvas` | `#F0F3F6` | Fundo principal da plataforma |
 | `text-primary` | `#101828` | Texto principal e conteúdo de alta prioridade |
-| `text-secondary` | `#667085` | Rótulos, descrições e conteúdo auxiliar |
-| `border` | `#E4E7EC` | Bordas e divisores |
+| `text-secondary` (`muted`) | `#5B6577` | Rótulos, descrições e conteúdo auxiliar (≥ 4,5:1 sobre canvas) |
+| `border` | `#E4E7EC` | Bordas decorativas e divisores (cards, listas) |
+| `field-border` | `#7A8599` | Borda de campos de formulário (contraste ≥ 3:1) |
 
 O tom `#F4F6F9` pode ser usado como alternativa de fundo quando necessário
-para diferenciar áreas sem criar uma nova cor de marca. Cores semânticas de
-sucesso, erro, alerta e informativo devem ser definidas com contraste WCAG AA e
-sempre acompanhadas de uma indicação não visual.
+para diferenciar áreas sem criar uma nova cor de marca. Cores semânticas (implementadas): sucesso `#067647`, erro `#B42318`, alerta
+`#B54708` e informativo `#175CD3`, todas com contraste WCAG AA nos badges. Devem
+sempre ser acompanhadas de texto ou ícone.
+
+**Foco:** anel de 2px em `primary` sobre superfícies claras e **branco** sobre
+superfícies escuras (classe `on-dark` na sidebar e no header mobile), pois o
+vermelho sobre azul tem apenas 1,8:1.
+
+**Ações destrutivas:** o vermelho de erro é próximo do primário; a diferença vem da
+forma, não do matiz: botão de contorno, ícone (`Ban`, etc.), rótulo explícito e
+confirmação por `ConfirmDialog` antes de executar.
 
 ### Tipografia
 
@@ -123,6 +141,11 @@ corretiva. Estados de carregamento não devem causar mudanças bruscas de layout
   pré-requisito pendente).
 - **Indisponível/offline:** erro de rede sem detalhes técnicos.
 
+Ações irreversíveis (revogar, desativar) exigem `ConfirmDialog`: foco inicial em
+"Cancelar", Esc e clique no fundo fecham, Tab não sai do diálogo e o foco volta ao
+elemento de origem. Segredos exibidos uma única vez (link de convite) avisam isso e
+oferecem botão de copiar.
+
 ## Grafismos e identidade visual
 
 - Setas e chevrons (`>` / `<`) podem indicar etapas, navegação, divisores de
@@ -163,14 +186,13 @@ Estas questões não impedem a implementação do MVP, mas devem ser resolvidas 
 registradas antes da publicação:
 
 1. Confirmar a marca exibida no shell (NPCP Academy, CIMATECjr ou composição
-   institucional) e obter seus ativos oficiais.
+   institucional) e obter seus ativos oficiais. **Ainda não há logo.**
 2. Confirmar as famílias Poppins e Questrial e sua forma de carregamento; definir
    fallback aprovado caso não estejam disponíveis.
 3. Definir a escala tipográfica numérica final e os breakpoints responsivos.
-4. Definir os tokens de sucesso, erro, alerta e informativo com seus estados
-   claro/escuro e critérios de contraste.
-5. Selecionar a biblioteca ou conjunto de ícones e suas regras de uso.
-6. Validar a necessidade de modo escuro após o MVP.
+4. Grafismos (setas, ondas, formas geométricas) ainda não foram aplicados; decidir
+   quais entram no MVP.
+5. Validar a necessidade de modo escuro após o MVP.
 
 Toda decisão nova deve ser incorporada neste arquivo, evitando documentos
 paralelos para a mesma finalidade.

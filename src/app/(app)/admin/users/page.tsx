@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+
 import { Badge, type BadgeTone } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -5,6 +7,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { listUsersForAdmin, type AdminUser } from "@/features/profiles/queries";
 import { requireRole } from "@/lib/auth/authorize";
 import { ROLE_LABELS } from "@/lib/auth/roles";
+import { formatDate } from "@/lib/format";
 
 function statusOf(user: AdminUser): { label: string; tone: BadgeTone } {
   if (user.disabled_at) {
@@ -15,6 +18,8 @@ function statusOf(user: AdminUser): { label: string; tone: BadgeTone } {
   }
   return { label: "Ativo", tone: "success" };
 }
+
+export const metadata: Metadata = { title: "Usuários" };
 
 export default async function AdminUsersPage() {
   const manager = await requireRole("manager");
@@ -48,7 +53,7 @@ export default async function AdminUsersPage() {
               return (
                 <li
                   key={user.id}
-                  className="flex items-center justify-between gap-4 px-4 py-3"
+                  className="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
                 >
                   <div className="min-w-0">
                     <p className="truncate font-medium text-ink">
@@ -56,6 +61,9 @@ export default async function AdminUsersPage() {
                     </p>
                     <p className="truncate text-sm text-muted">
                       {user.email ?? "—"}
+                      {user.activated_at
+                        ? ` · ativo desde ${formatDate(user.activated_at)}`
+                        : ""}
                     </p>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">

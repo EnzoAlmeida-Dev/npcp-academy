@@ -18,7 +18,7 @@ const questrial = Questrial({
 });
 
 export const metadata: Metadata = {
-  title: "NPCP Academy",
+  title: { default: "NPCP Academy", template: "%s · NPCP Academy" },
   description: "Plataforma interna de capacitação técnica do NPCP",
 };
 

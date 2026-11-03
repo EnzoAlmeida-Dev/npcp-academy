@@ -8,8 +8,9 @@
   --color-canvas: #f0f3f6;
   --color-canvas-alt: #f4f6f9;
   --color-ink: #101828;
-  --color-muted: #667085;
+  --color-muted: #5b6577;
   --color-border: #e4e7ec;
+  --color-field-border: #7a8599;
 
   --color-success: #067647;
   --color-danger: #b42318;
@@ -26,4 +27,23 @@
 body {
   background: var(--color-canvas);
   color: var(--color-ink);
+}
+
+/* Foco padrao; superficies escuras usam anel branco (contraste >= 3:1). */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.on-dark :focus-visible {
+  outline-color: #ffffff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

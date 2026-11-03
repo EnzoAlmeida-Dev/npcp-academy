@@ -1,10 +1,13 @@
 import type { ReactNode } from "react";
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { StatusPanel } from "@/components/ui/status-panel";
 import { consumeInvite, getInvitationInfo } from "@/features/invitations/info";
 import { InviteAcceptForm } from "@/features/invitations/invite-accept-form";
 import { createClient } from "@/lib/supabase/server";
+
+export const metadata: Metadata = { title: "Convite" };
 
 export default async function InvitePage({
   params,
