@@ -1,97 +1,84 @@
 # Plano incremental de implementação
 
-## Fase 0 — Alinhamento
-Entregáveis:
-- Confirmar stack e provedor.
-- Resolver regras iniciais de convite, papéis, XP, níveis e competências.
-- Criar backlog ligado aos IDs do PRD.
-- Definir seed fictício da trilha piloto.
+Estado atual de cada fase em `STATUS.md`. Referências `Dnn` apontam para `docs/product/DECISIONS.md`. Cada fase só começa com as decisões indicadas resolvidas.
 
-Saída: nenhuma decisão crítica de segurança ou de negócio permanece implícita.
+| Fase | Tema | Estado | Decisões necessárias |
+|---|---|---|---|
+| 0 | Alinhamento | Concluída (pendências listadas em `DECISIONS.md`) | — |
+| 1 | Fundação | Concluída | — |
+| 2 | Identidade e convites | Concluída | — |
+| 2b | Contas e qualidade | Próxima | D28, D29 (D30 só para exclusão) |
+| 3 | Conteúdo e trilhas | Planejada | D23–D27; D32/D33 durante a fase |
+| 4 | Progresso e autodeclaração | Planejada | D10, D15, D24 |
+| 5 | Submissões e revisão | Planejada | D3, D4, D19, D25 |
+| 6 | Competências e gamificação | Planejada | D2, D11, D12, D16, D20; **D13, D14 abertas** |
+| 7 | Painel gerencial | Planejada | — |
+| 8 | Endurecimento e lançamento | Planejada | D30, D34 |
 
-## Fase 1 — Fundação
+## Fase 1 — Fundação (concluída)
+Projeto, lint, typecheck, testes, estrutura de features, ambientes, conexão com banco, primeira migração, README e `.env.example`.
+
+## Fase 2 — Identidade e convites (concluída)
+Login/logout, criação, consumo, expiração e revogação de convites, perfis e papéis, autorização no servidor e RLS, confirmação de e-mail.
+
+## Fase 2b — Contas e qualidade
 Implementar:
-- projeto, lint, typecheck e testes;
-- estrutura de features;
-- configuração de ambientes;
-- conexão com banco;
-- primeira migração;
-- README e `.env.example`.
+- etapa obrigatória de nome de exibição após ativação e edição posterior (D28);
+- recuperação de senha (D8);
+- alteração de papel, desativação e reativação pela gerência, com registro de eventos (D9, D21, D29);
+- suíte de integração de RLS/RPC executável por comando documentado, migrando os scripts E2E atuais;
+- revisão da senha mínima.
 
 Aceitação:
-- aplicação roda localmente;
-- migrações são reproduzíveis;
-- segredos não estão versionados;
-- lint, typecheck, testes e build passam.
-
-## Fase 2 — Identidade e convites
-Implementar:
-- login/logout;
-- criação e consumo de convite;
-- expiração e revogação;
-- perfis e papéis;
-- autorização no servidor e políticas no banco.
-
-Aceitação:
-- convite válido funciona uma vez;
-- convite usado/expirado falha;
-- membro não acessa rotas administrativas;
-- testes negativos de acesso passam.
+- AC-41 a AC-46 passam;
+- usuário não altera o próprio papel; último gerente protegido;
+- conta desativada perde acesso imediatamente.
 
 ## Fase 3 — Conteúdo e trilhas
 Implementar:
-- CRUD de trilhas, módulos, atividades e competências;
-- rascunho/publicação;
-- catálogo e páginas de trilha;
-- links de aulas externas;
-- seed de uma trilha piloto de desenvolvimento web.
+- esquema de trilhas, pré-requisitos, módulos, atividades, recursos e competências;
+- gestão de conteúdo por responsáveis técnicos e gerência, com rascunho/publicação/arquivamento;
+- catálogo e páginas de trilha, com indicação de bloqueio;
+- seed fictício de uma trilha piloto de desenvolvimento web.
 
 Aceitação:
-- responsável autorizado cria e publica conteúdo;
-- membro vê apenas conteúdo publicado;
+- AC-06 a AC-10, AC-47, AC-48;
+- membro vê apenas conteúdo publicado e não edita conteúdo;
 - conteúdo pode ser atualizado sem apagar histórico.
 
 ## Fase 4 — Progresso e autodeclaração
 Implementar:
 - progresso individual;
-- iniciar/concluir atividade simples;
-- estado vazio, carregamento e erros;
-- regra idempotente de recompensa para conclusão autodeclarada.
+- iniciar/concluir atividade de conteúdo;
+- bloqueio por pré-requisito no servidor;
+- livro de XP e concessão idempotente para atividades elegíveis (os valores podem ser placeholders até D13);
+- estados vazio, carregamento e erro.
 
 Aceitação:
-- progresso é individual;
-- repetição da requisição não duplica XP;
+- AC-11, AC-12, AC-13, AC-28, AC-29, AC-30, AC-51;
 - membro não altera progresso alheio.
 
 ## Fase 5 — Submissões e revisão compartilhada
 Implementar:
-- envio de evidências;
+- envio de evidências (URL/texto) e versões;
 - fila compartilhada;
-- operação atômica de assumir revisão;
-- aprovação/solicitação de ajustes;
-- feedback e histórico;
+- assumir, liberar e reatribuir revisão;
+- aprovação/solicitação de ajustes com feedback e histórico;
 - bloqueio de autoavaliação.
 
 Aceitação:
-- concorrência não gera dois revisores atribuídos;
-- decisão registra revisor e data;
-- aprovação e XP são consistentes;
-- reenvio preserva versões.
+- AC-14 a AC-22, AC-34, AC-49.
 
 ## Fase 6 — Competências e gamificação
 Implementar:
-- estados de competência;
-- evidências de competência;
-- livro de transações de XP;
+- estados e evidências de competência;
+- correções de competência e de XP;
 - regras de níveis;
 - perfil individual;
 - ranking geral.
 
 Aceitação:
-- competência demonstrada exige evidência aprovada;
-- XP não é alterável pelo cliente;
-- recompensa é única por evento;
-- regra de empate do ranking é estável.
+- AC-23 a AC-27, AC-31 a AC-33, AC-50.
 
 ## Fase 7 — Painel gerencial
 Implementar:
@@ -101,29 +88,30 @@ Implementar:
 - filtros mínimos.
 
 Aceitação:
-- apenas papéis autorizados acessam métricas gerenciais;
-- indicadores usam definições documentadas;
+- AC-35, AC-36;
+- indicadores usam definições documentadas (`PRD.md` §10);
 - consultas não revelam dados além do necessário.
 
 ## Fase 8 — Endurecimento e lançamento
 Implementar/verificar:
 - testes E2E dos fluxos principais;
-- testes de autorização;
+- testes de autorização para todos os papéis;
 - acessibilidade e responsividade;
 - erros e logs;
-- migrações de produção;
+- exclusão de conta (após D30) e termos/aviso de privacidade (D34);
 - seed de demonstração sem dados pessoais;
-- implantação e procedimento de rollback.
+- procedimento de backup e rollback.
 
 Aceitação:
 - todos os critérios Must Have passam;
-- procedimento de implantação foi executado;
-- limitações e riscos conhecidos estão documentados.
+- checklist de `SECURITY.md` completo;
+- limitações e riscos conhecidos documentados em `STATUS.md`.
 
 ## Definition of Done para cada tarefa
 - Critérios de aceitação satisfeitos.
 - Testes relevantes criados e executados.
 - Autorização verificada para sucesso e falha.
-- Documentação atualizada quando necessária.
+- `STATUS.md` atualizado; `DECISIONS.md` atualizado se uma decisão ou suposição foi tomada.
+- Documentação de arquitetura atualizada quando o comportamento mudar.
 - Sem segredos ou dados reais em commits.
 - Resumo de mudanças, testes, pressupostos e riscos entregue.

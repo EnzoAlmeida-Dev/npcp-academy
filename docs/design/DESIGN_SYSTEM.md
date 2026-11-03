@@ -8,7 +8,7 @@ Este documento é a fonte única para as decisões de design visual e UX/UI da
 plataforma. A interface deve ser clara, discreta e funcional, priorizando
 legibilidade, consistência e acessibilidade sobre efeitos visuais.
 
-## Implementação atual (Etapa de design)
+## Implementação atual
 
 - Tokens de cor, raio e sombra aplicados em `src/app/globals.css` (Tailwind v4 `@theme`).
 - Fontes **Poppins** (títulos) e **Questrial** (corpo) carregadas via `next/font/google`.
@@ -20,7 +20,8 @@ legibilidade, consistência e acessibilidade sobre efeitos visuais.
 
 ## Princípios
 
-- Plataforma interna de capacitação profissional, com hierarquia visual clara.- Componentes reutilizáveis, previsíveis e com estados explícitos.
+- Plataforma interna de capacitação profissional, com hierarquia visual clara.
+- Componentes reutilizáveis, previsíveis e com estados explícitos.
 - A interface não é mecanismo de segurança: autorização continua no servidor e
   no banco de dados.
 - Nunca comunicar estado apenas por cor; combinar cor com texto, ícone ou forma.
@@ -110,6 +111,18 @@ Componentes mínimos do MVP:
 Mensagens de erro devem explicar o problema e, quando possível, indicar a ação
 corretiva. Estados de carregamento não devem causar mudanças bruscas de layout.
 
+### Estados obrigatórios de tela
+
+- **Carregando:** feedback visível durante envio de formulários e carregamento.
+- **Vazio:** mensagem clara e próxima ação (ex.: "Nenhum convite criado").
+- **Erro:** mensagem compreensível; em autenticação, **genérica** (sem revelar
+  existência de conta ou convite).
+- **Sucesso:** confirmação explícita (ex.: convite criado com link; "confirme seu e-mail").
+- **Sem permissão:** mensagem de acesso negado (a autorização real é no servidor/RLS).
+- **Bloqueado:** item indisponível com o motivo e o que o libera (ex.: trilha com
+  pré-requisito pendente).
+- **Indisponível/offline:** erro de rede sem detalhes técnicos.
+
 ## Grafismos e identidade visual
 
 - Setas e chevrons (`>` / `<`) podem indicar etapas, navegação, divisores de
@@ -131,6 +144,18 @@ corretiva. Estados de carregamento não devem causar mudanças bruscas de layout
   equivalente, sem anunciar conteúdo excessivo.
 - Garantir uso em telas pequenas sem depender de hover, largura fixa ou gesto
   exclusivo.
+- Formulários com largura máxima adequada; fluxos principais funcionais em
+  desktop e celular.
+
+## Definição de pronto (UX/UI)
+
+- Estados de tela aplicáveis implementados (ver "Estados obrigatórios de tela").
+- Navegação por teclado e foco visível verificados manualmente.
+- Contraste e rótulos revisados.
+- Layout testado em ao menos dois tamanhos de tela (celular e desktop).
+- Telas novas seguem o mapa de navegação de `docs/product/USER_FLOWS.md`;
+  esboços de layout, quando necessários, acompanham a tarefa em vez de virar
+  documento separado.
 
 ## Questões de design ainda abertas
 

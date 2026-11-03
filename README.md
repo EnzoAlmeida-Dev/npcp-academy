@@ -1,116 +1,105 @@
-# NPCP Academy — documentação do MVP
+# NPCP Academy
 
-Versão: 1.0 (especificação inicial)  
-Status: proposta para validação antes da implementação.
+Plataforma interna de capacitação técnica para membros e trainees do Núcleo de Projetos de Computação (NPCP), começando por uma trilha piloto de desenvolvimento web.
 
-## Ordem de leitura
-1. `docs/product/PRD.md` — visão, escopo e requisitos.
-2. `docs/product/ACCEPTANCE_CRITERIA.md` — critérios verificáveis.
-3. `docs/product/USER_FLOWS.md` — fluxos principais.
-4. `docs/architecture/SYSTEM_DESIGN.md` — arquitetura candidata.
-5. `docs/architecture/DATA_MODEL.md` — entidades e integridade.
-6. `docs/architecture/SECURITY.md` — controles mínimos de segurança.
-7. `docs/decisions/ADR-001-STACK.md` — decisão tecnológica provisória.
-8. `docs/implementation/IMPLEMENTATION_PLAN.md` — fases e Definition of Done.
-9. `AGENTS.md` — instruções persistentes para o agente de código.
-10. `docs/implementation/ETAPA-1_HANDOFF.md` — registro de decisões e mudanças da Etapa 1 (continuidade/backup).
+Stack: Next.js + TypeScript + Supabase (Auth/Postgres/RLS) + Tailwind, hospedado no Vercel. Estado atual em [`docs/implementation/STATUS.md`](docs/implementation/STATUS.md).
 
-## Como usar com OpenCode
-- Coloque estes arquivos na raiz de um repositório novo ou copie-os para o repositório existente.
-- Peça ao agente para ler `AGENTS.md` e os documentos listados antes de implementar.
-- Revise as decisões marcadas como provisórias antes de executar migrações ou publicar.
-- Implemente por fatias pequenas, com testes e revisão humana em cada etapa.
-- Nunca inclua segredos reais no repositório. Use `.env.example` com nomes de variáveis e valores fictícios.
+## Documentação
 
-## Princípio
-O PRD define o que o produto deve fazer. `AGENTS.md` define como o agente deve trabalhar. Os critérios de aceitação e testes verificam se a implementação corresponde ao PRD.
-
----
+| Documento | Conteúdo |
+|---|---|
+| [`AGENTS.md`](AGENTS.md) | Como o agente de código deve trabalhar neste repositório |
+| [`docs/product/PRD.md`](docs/product/PRD.md) | Visão, papéis, escopo, requisitos e regras de negócio |
+| [`docs/product/DECISIONS.md`](docs/product/DECISIONS.md) | Decisões de produto tomadas, suposições e itens em aberto |
+| [`docs/product/ACCEPTANCE_CRITERIA.md`](docs/product/ACCEPTANCE_CRITERIA.md) | Critérios verificáveis e testes negativos obrigatórios |
+| [`docs/product/USER_FLOWS.md`](docs/product/USER_FLOWS.md) | Fluxos e mapa de navegação por papel |
+| [`docs/architecture/SYSTEM_DESIGN.md`](docs/architecture/SYSTEM_DESIGN.md) | Arquitetura, organização do código, fluxos críticos e ambientes |
+| [`docs/architecture/DATA_MODEL.md`](docs/architecture/DATA_MODEL.md) | Esquema implementado e planejado |
+| [`docs/architecture/SECURITY.md`](docs/architecture/SECURITY.md) | Ameaças, controles, matriz de autorização e checklist |
+| [`docs/decisions/`](docs/decisions/) | ADRs técnicos |
+| [`docs/design/DESIGN_SYSTEM.md`](docs/design/DESIGN_SYSTEM.md) | Tokens, componentes, estados de tela e acessibilidade |
+| [`docs/implementation/IMPLEMENTATION_PLAN.md`](docs/implementation/IMPLEMENTATION_PLAN.md) | Fases, aceitação e Definition of Done |
+| [`docs/implementation/STATUS.md`](docs/implementation/STATUS.md) | O que está implementado, testes, lacunas, riscos e armadilhas |
 
 ## Desenvolvimento
 
-Stack: Next.js + TypeScript + Supabase (Auth/Postgres/RLS) + Tailwind. Testes com Vitest.
-
 ### Requisitos
-
-- Node.js >= 22 (o projeto declara `engines.node`; usa Node 24 localmente).
-- **Opcional:** Docker Desktop + Supabase CLI, apenas para o Supabase **local**.
-- Para a nuvem (recomendado para Vercel) não é necessário Docker.
+- Node.js >= 22 (`engines.node`).
+- Opcional: Docker Desktop, para o Supabase local (Supabase CLI já é devDependency).
 
 ### Ambientes (local × nuvem)
-
-- `.env.local` — **alvo ativo** (nuvem ou local). Versão de referência: `.env.example`.
+- `.env.local` — alvo ativo (nuvem). Modelo: `.env.example`.
 - `.env.development.local` — override opcional do Supabase **local** (Docker).
-  É ignorado pelo Git.
 
-O comando `npm run dev` (`scripts/dev.mjs`) escolhe automaticamente:
-1. Se o Supabase **local** responder, usa `.env.development.local`.
-2. Caso contrário, se existir `.env.local`, usa a **nuvem** (fallback) — assim
-   "esquecer o Docker" não quebra o desenvolvimento.
+Ambos são ignorados pelo Git. Salve-os em UTF-8 **sem BOM**.
 
-Diagnóstico: `npm run check:supabase` (mostra alvo e conectividade, sem expor valores).
-Para rodar o Next direto, sem o launcher: `npm run dev:next`.
+`npm run dev` (`scripts/dev.mjs`) escolhe o alvo:
+1. se o Supabase local responder, usa `.env.development.local`;
+2. senão, usa `.env.local` (nuvem).
 
-### Configuração
+> Atenção: hoje o projeto em nuvem é o de produção. Sem o Supabase local rodando, o desenvolvimento usa dados de produção.
 
-1. `npm install`
-2. Nuvem (recomendado): preencha `.env.local` com URL, publishable key,
-   `SUPABASE_SERVICE_ROLE_KEY` (apenas para bootstrap), `INVITE_TTL_DAYS` e `APP_URL`.
-3. Local (opcional): `npx supabase start` e crie `.env.development.local` com os
-   valores de `npx supabase status`; aplique migrações com `npx supabase migration up`.
+Diagnóstico sem expor valores: `npm run check:supabase`.
+
+### Configuração local
+```powershell
+npm install
+npx supabase start
+# criar .env.development.local com os valores de `npx supabase status`:
+#   NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+#   SUPABASE_SERVICE_ROLE_KEY, INVITE_TTL_DAYS=7, APP_URL=http://127.0.0.1:3000
+npx supabase migration up
+npm run dev        # http://127.0.0.1:3000 (use 127.0.0.1, não localhost)
+```
+
+- Studio: `http://127.0.0.1:55424` · Mailpit (e-mails locais): `http://127.0.0.1:55425`.
+- Contas de teste locais: `node --env-file-if-exists=.env.development.local scripts/seed-local-test-accounts.mjs`.
 
 ### Bootstrap do primeiro gerente
-
 - Nuvem: `npm run seed:manager -- --email=gerente@exemplo.com --confirm`
 - Local: `npm run seed:manager:local -- --email=gerente@exemplo.com --confirm`
 
-O script é idempotente, exige `--confirm`, valida exatamente uma conta, informa se
-o alvo é local/nuvem e nunca imprime segredos. Não roda em CI.
+O script é idempotente, exige `--confirm`, cria a conta de auth se não existir (senha temporária em `MANAGER_PASSWORD`, nunca impressa), informa se o alvo é local ou nuvem e não roda em CI. Exige `SUPABASE_SERVICE_ROLE_KEY` no ambiente local de quem executa.
 
 ### Comandos
+| Comando | Uso |
+|---|---|
+| `npm run dev` | Dev com seleção automática de ambiente |
+| `npm run dev:next` | Dev sem o launcher |
+| `npm run check:supabase` | Conectividade dos ambientes |
+| `npm run lint` / `npm run typecheck` | Qualidade |
+| `npm test` / `npm run test:watch` | Testes Vitest |
+| `npm run build` / `npm run start` | Produção (não rodar `build` com `dev` ativo) |
 
-- `npm run dev` — dev com seleção automática de ambiente.
-- `npm run dev:next` — dev sem o launcher.
-- `npm run check:supabase` — conectividade dos ambientes.
-- `npm run build` / `npm run start` — produção.
-- `npm run lint` / `npm run typecheck` / `npm test` / `npm run test:watch`.
+Verificações E2E manuais (Supabase local): `scripts/e2e-smoke.mjs` e `scripts/e2e-invite-email.mjs`.
 
 ### Migrações e seeds
+- Migrações versionadas em `supabase/migrations/`. Mudança de esquema sempre por nova migração.
+- Seed fictício em `supabase/seed.sql` (nunca dados reais).
+- Após mudar o esquema: `npx supabase gen types typescript --local > src/types/database.ts`.
+- Nuvem: `npx supabase link --project-ref <ref>`, conferir com `npx supabase migration list --linked` e aplicar com `npx supabase db push`. **Nunca** execute `db reset --linked`.
 
-- Migrações em `supabase/migrations/` (versionadas).
-- Seed fictício em `supabase/seed.sql` (sem dados reais).
-- Tipos do banco: `npx supabase gen types typescript --local`.
-- **Nuvem:** aplicar migrações exige identificar e confirmar o alvo
-  (`npx supabase link --project-ref <ref>` + `npx supabase db push`).
-  Nunca execute `db reset --linked`.
+## Implantação (Vercel)
 
-### Vercel (hospedagem gratuita)
+A aplicação está publicada no Vercel com domínio próprio. Para um novo ambiente:
 
-O app é um Next.js padrão e não usa Docker em runtime. No painel do Vercel:
-
-1. Importe o repositório (Framework: Next.js; plano Hobby/gratuito).
-2. Configure as Environment Variables (produção):
+1. Importar o repositório no Vercel (framework Next.js).
+2. Environment Variables:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
-   - `SUPABASE_SERVICE_ROLE_KEY` (server-only; só para bootstrap)
    - `INVITE_TTL_DAYS` (ex.: `7`)
-   - `APP_URL` = URL do deploy (ex.: `https://seu-projeto.vercel.app`)
-     (se omitido, o app usa `VERCEL_PROJECT_PRODUCTION_URL`/`VERCEL_URL`).
-3. No projeto Supabase **em nuvem**:
-   - Habilite **confirmação de e-mail**.
-   - Adicione a URL do deploy à **allowlist de redirects**.
-   - Aplique as migrações no projeto correto.
-   - Configure SMTP para e-mails (o serviço padrão do Supabase tem limite baixo;
-     para um piloto, use um SMTP próprio, ex.: Resend).
+   - `APP_URL` = URL pública (se omitida, usa `VERCEL_PROJECT_PRODUCTION_URL`/`VERCEL_URL`)
+   - `SUPABASE_SERVICE_ROLE_KEY` **não** é necessária: a aplicação não a usa em execução.
+3. No Supabase em nuvem:
+   - confirmação de e-mail habilitada;
+   - `APP_URL` e `APP_URL/auth/confirm` na allowlist de redirects;
+   - SMTP próprio configurado (Resend);
+   - migrações aplicadas no projeto correto;
+   - primeiro gerente criado via `seed:manager`.
 
-Observações de custo/limites: Vercel Hobby é gratuito para uso não comercial;
-o Supabase gratuito pode pausar por inatividade e tem limite de e-mails. Nenhum
-serviço local (Docker/CLI) é necessário para o app rodar no Vercel.
+Rollback: redeploy de uma versão anterior no Vercel; no banco, migração corretiva (nunca reset).
 
-### Segurança
-
-- `SUPABASE_SERVICE_ROLE_KEY` é **exclusiva de servidor**: nunca use `NEXT_PUBLIC_*`
-  para segredos, nunca versionar, nunca logar.
+## Segurança
+- `SUPABASE_SERVICE_ROLE_KEY` é exclusiva de scripts de servidor: nunca `NEXT_PUBLIC_*`, nunca versionar, nunca logar.
 - `src/lib/supabase/admin.ts` e `src/lib/env.server.ts` são protegidos com `server-only`.
-- Nunca execute `db push`/`db reset` em ambiente remoto sem autorização explícita
-  e identificação do alvo. Nunca execute `db reset --linked`.
+- Detalhes em [`docs/architecture/SECURITY.md`](docs/architecture/SECURITY.md).

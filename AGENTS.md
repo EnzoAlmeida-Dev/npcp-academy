@@ -5,15 +5,20 @@ Construir uma plataforma web de capacitação técnica para membros e trainees d
 
 ## Fonte de verdade
 - Produto e escopo: `docs/product/PRD.md`
+- Decisões de produto, suposições e itens em aberto: `docs/product/DECISIONS.md`
 - Critérios verificáveis: `docs/product/ACCEPTANCE_CRITERIA.md`
-- Fluxos: `docs/product/USER_FLOWS.md`
+- Fluxos e navegação por papel: `docs/product/USER_FLOWS.md`
 - Arquitetura: `docs/architecture/SYSTEM_DESIGN.md`
 - Modelo de dados: `docs/architecture/DATA_MODEL.md`
 - Segurança: `docs/architecture/SECURITY.md`
 - Decisões técnicas: `docs/decisions/`
+- Design e UX: `docs/design/DESIGN_SYSTEM.md`
 - Plano de implementação: `docs/implementation/IMPLEMENTATION_PLAN.md`
+- Estado atual do código: `docs/implementation/STATUS.md`
 
-Se documentos entrarem em conflito, não escolha silenciosamente. Descreva o conflito, identifique o impacto e peça uma decisão se ela afetar produto, segurança, dados ou arquitetura.
+Leia `STATUS.md` e `DECISIONS.md` no início de cada sessão. Decisões com status "Aberta" não podem ser implementadas por suposição.
+
+Se documentos entrarem em conflito, não escolha silenciosamente. Descreva o conflito, identifique o impacto e peça uma decisão se ela afetar produto, segurança, dados ou arquitetura. `DECISIONS.md` prevalece sobre os demais documentos de produto; as migrações prevalecem sobre a descrição do esquema implementado.
 
 ## Modo de trabalho
 1. Inspecione o repositório e leia as instruções antes de editar.
@@ -22,7 +27,7 @@ Se documentos entrarem em conflito, não escolha silenciosamente. Descreva o con
 4. Não implemente funcionalidades fora do MVP sem aprovação explícita.
 5. Não invente regras de negócio para preencher lacunas importantes.
 6. Quando uma decisão for reversível e de baixo impacto, proponha uma opção simples e registre a suposição.
-7. Atualize documentação e testes quando o comportamento mudar.
+7. Atualize documentação e testes quando o comportamento mudar. Ao concluir uma etapa, atualize `STATUS.md`; ao tomar uma decisão ou suposição, registre-a em `DECISIONS.md` com o próximo ID livre.
 8. Não declare sucesso sem executar os testes relevantes; liste o que não foi executado.
 
 ## Regras de engenharia
