@@ -4,6 +4,7 @@ import { Badge, type BadgeTone } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
+import { UserActions } from "@/features/accounts/user-actions";
 import { listUsersForAdmin, type AdminUser } from "@/features/profiles/queries";
 import { requireRole } from "@/lib/auth/authorize";
 import { ROLE_LABELS } from "@/lib/auth/roles";
@@ -37,7 +38,7 @@ export default async function AdminUsersPage() {
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Usuários"
-        description="Contas cadastradas na plataforma."
+        description="Contas, papéis e status. Mudanças de papel e de status ficam registradas."
       />
 
       {users.length === 0 ? (
@@ -50,6 +51,8 @@ export default async function AdminUsersPage() {
           <ul className="divide-y divide-border">
             {users.map((user) => {
               const status = statusOf(user);
+              const isSelf = user.id === manager.id;
+              const name = user.display_name ?? user.email ?? "Usuário";
               return (
                 <li
                   key={user.id}
@@ -66,9 +69,20 @@ export default async function AdminUsersPage() {
                         : ""}
                     </p>
                   </div>
-                  <div className="flex shrink-0 items-center gap-2">
-                    <Badge tone="info">{ROLE_LABELS[user.role]}</Badge>
-                    <Badge tone={status.tone}>{status.label}</Badge>
+                  <div className="flex shrink-0 flex-col gap-2 sm:items-end">
+                    <div className="flex flex-wrap items-center gap-2">
+                      {isSelf ? <Badge tone="neutral">Você</Badge> : null}
+                      <Badge tone="info">{ROLE_LABELS[user.role]}</Badge>
+                      <Badge tone={status.tone}>{status.label}</Badge>
+                    </div>
+                    {!isSelf && user.activated_at ? (
+                      <UserActions
+                        userId={user.id}
+                        name={name}
+                        role={user.role}
+                        disabled={user.disabled_at !== null}
+                      />
+                    ) : null}
                   </div>
                 </li>
               );

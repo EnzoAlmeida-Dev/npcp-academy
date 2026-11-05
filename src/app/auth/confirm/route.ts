@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
+import { safeNextPath } from "@/lib/auth/redirect";
 import { getPublicEnv } from "@/lib/env";
 import type { Database } from "@/types/database";
 
@@ -18,10 +19,15 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get("code");
   const tokenHash = searchParams.get("token_hash");
   const rawType = searchParams.get("type");
+  // Recuperacao de senha chega com ?next=/reset-password (PKCE) ou type=recovery.
+  const next =
+    safeNextPath(searchParams.get("next")) ??
+    (rawType === "recovery" ? "/reset-password" : null);
+  const destination = next ?? "/dashboard";
 
   const env = getPublicEnv();
 
-  let response = NextResponse.redirect(new URL("/dashboard", request.url));
+  let response = NextResponse.redirect(new URL(destination, request.url));
 
   const supabase = createServerClient<Database>(
     env.NEXT_PUBLIC_SUPABASE_URL,
@@ -36,7 +42,7 @@ export async function GET(request: NextRequest) {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value),
           );
-          response = NextResponse.redirect(new URL("/dashboard", request.url));
+          response = NextResponse.redirect(new URL(destination, request.url));
           cookiesToSet.forEach(({ name, value, options }) =>
             response.cookies.set(name, value, options),
           );
@@ -79,10 +85,16 @@ export async function GET(request: NextRequest) {
   }
 
   if (failed) {
-    return NextResponse.redirect(new URL("/login?error=confirm", request.url));
+    return NextResponse.redirect(
+      new URL(
+        next ? "/forgot-password?error=link" : "/login?error=confirm",
+        request.url,
+      ),
+    );
   }
 
-  if (inviteToken) {
+  // O token do convite so direciona a confirmacao de cadastro.
+  if (inviteToken && !next) {
     response.headers.set(
       "Location",
       new URL(`/invite/${inviteToken}`, request.url).toString(),

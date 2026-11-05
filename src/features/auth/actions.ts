@@ -55,6 +55,15 @@ export async function loginAction(
     }
   }
 
+  // Conta desativada: encerra a sessao e informa (so apos senha correta).
+  const { data: status } = await supabase.rpc("get_my_account_status");
+  if (status?.[0]?.disabled) {
+    await supabase.auth.signOut();
+    return {
+      error: "Esta conta está desativada. Fale com a gerência do NPCP.",
+    };
+  }
+
   redirect("/dashboard");
 }
 

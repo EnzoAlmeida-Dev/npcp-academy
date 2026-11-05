@@ -5,6 +5,7 @@ import { z } from "zod";
 
 import type { ActionState } from "@/lib/action-state";
 import { requireRole } from "@/lib/auth/authorize";
+import { newPasswordSchema, PASSWORD_MIN_LENGTH } from "@/lib/auth/password";
 import { getAppServerEnv } from "@/lib/env.server";
 import { createClient } from "@/lib/supabase/server";
 
@@ -88,10 +89,10 @@ export async function revokeInvitationAction(
   return { success: true };
 }
 
+// O nome de exibicao e definido apos a ativacao (D28), nao no cadastro.
 const signupSchema = z.object({
   token: z.string().min(1),
-  password: z.string().min(6),
-  display_name: z.string().max(120).optional(),
+  password: newPasswordSchema,
 });
 
 export async function signUpForInviteAction(
@@ -101,11 +102,12 @@ export async function signUpForInviteAction(
   const parsed = signupSchema.safeParse({
     token: formData.get("token"),
     password: formData.get("password"),
-    display_name: formData.get("display_name") ?? "",
   });
 
   if (!parsed.success) {
-    return { error: "Dados inválidos. Verifique a senha (mínimo 6 caracteres)." };
+    return {
+      error: `Dados inválidos. A senha deve ter entre ${PASSWORD_MIN_LENGTH} e 72 caracteres.`,
+    };
   }
 
   const info = await getInvitationInfo(parsed.data.token);
@@ -119,7 +121,6 @@ export async function signUpForInviteAction(
     password: parsed.data.password,
     options: {
       data: {
-        display_name: parsed.data.display_name?.trim() ?? "",
         invite_token: parsed.data.token,
       },
       emailRedirectTo: `${getAppServerEnv().APP_URL}/auth/confirm`,

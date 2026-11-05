@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { Card } from "@/components/ui/card";
@@ -36,7 +37,22 @@ export default async function LoginPage({
             peça um novo convite à gerência.
           </FormMessage>
         ) : null}
+        {error === "inactive" ? (
+          <FormMessage className="mb-4">
+            Sua conta não está ativa. Se acabou de se cadastrar, confirme o
+            e-mail e abra de novo o link do convite. Se a conta foi desativada,
+            fale com a gerência.
+          </FormMessage>
+        ) : null}
         <LoginForm />
+        <p className="mt-6 text-center text-sm">
+          <Link
+            href="/forgot-password"
+            className="text-secondary underline hover:text-primary"
+          >
+            Esqueci a senha
+          </Link>
+        </p>
       </Card>
     </main>
   );

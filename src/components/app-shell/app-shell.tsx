@@ -1,11 +1,13 @@
 import type { ReactNode } from "react";
-import { LogOut } from "lucide-react";
+import { LogOut, UserRound } from "lucide-react";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { logoutAction } from "@/features/auth/actions";
 import { ROLE_LABELS } from "@/lib/auth/roles";
 import { getCurrentProfile } from "@/lib/auth/session";
 import { getNavItemsForRole } from "@/lib/navigation";
+import { createClient } from "@/lib/supabase/server";
 
 import { MobileNav } from "./mobile-nav";
 import { NavList } from "./nav-list";
@@ -27,11 +29,19 @@ export default async function AppShell({
 }) {
   const profile = await getCurrentProfile();
   if (!profile) {
-    redirect("/login");
+    // Sessao valida sem perfil visivel = conta inativa ou desativada (RLS).
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    redirect(user ? "/login?error=inactive" : "/login");
+  }
+  if (!profile.display_name) {
+    redirect("/welcome");
   }
 
   const items = getNavItemsForRole(profile.role);
-  const name = profile.display_name ?? "Usuário";
+  const name = profile.display_name;
   const roleLabel = ROLE_LABELS[profile.role];
 
   return (
@@ -51,10 +61,17 @@ export default async function AppShell({
         <div className="border-t border-white/10 px-6 py-4">
           <p className="text-sm font-medium text-white">{name}</p>
           <p className="text-xs text-white/70">{roleLabel}</p>
+          <Link
+            href="/profile"
+            className="mt-2 flex items-center gap-2 py-1 text-sm text-white/80 underline hover:text-white"
+          >
+            <UserRound aria-hidden="true" className="size-4" />
+            Meu perfil
+          </Link>
           <form action={logoutAction}>
             <button
               type="submit"
-              className="mt-2 inline-flex items-center gap-2 py-1 text-sm text-white/80 underline hover:text-white"
+              className="inline-flex items-center gap-2 py-1 text-sm text-white/80 underline hover:text-white"
             >
               <LogOut aria-hidden="true" className="size-4" />
               Sair

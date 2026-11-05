@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { LogOut, Menu, X } from "lucide-react";
+import { LogOut, Menu, UserRound, X } from "lucide-react";
+import Link from "next/link";
 
 import { logoutAction } from "@/features/auth/actions";
 import type { NavItem } from "@/lib/navigation";
@@ -72,10 +73,18 @@ export function MobileNav({
             <p className="text-sm text-white">
               {name} · {role}
             </p>
+            <Link
+              href="/profile"
+              onClick={() => setOpen(false)}
+              className="mt-2 flex items-center gap-2 py-2 text-sm text-white/80 underline hover:text-white"
+            >
+              <UserRound aria-hidden="true" className="size-4" />
+              Meu perfil
+            </Link>
             <form action={logoutAction}>
               <button
                 type="submit"
-                className="mt-2 inline-flex items-center gap-2 py-2 text-sm text-white/80 underline hover:text-white"
+                className="inline-flex items-center gap-2 py-2 text-sm text-white/80 underline hover:text-white"
               >
                 <LogOut aria-hidden="true" className="size-4" />
                 Sair

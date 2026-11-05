@@ -5,12 +5,12 @@ import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { FormMessage } from "@/components/ui/form-message";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/password-input";
 import { StatusPanel } from "@/components/ui/status-panel";
 import { signUpForInviteAction } from "@/features/invitations/actions";
 import type { ActionState } from "@/lib/action-state";
+import { PASSWORD_MIN_LENGTH } from "@/lib/auth/password";
 
 const initialState: ActionState = {};
 
@@ -51,22 +51,18 @@ export function InviteAcceptForm({
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="display_name">Nome de exibição (opcional)</Label>
-          <Input id="display_name" name="display_name" maxLength={120} />
-        </div>
-
-        <div className="flex flex-col gap-1.5">
           <Label htmlFor="password">Senha</Label>
           <PasswordInput
             id="password"
             name="password"
             autoComplete="new-password"
             required
-            minLength={6}
+            minLength={PASSWORD_MIN_LENGTH}
+            maxLength={72}
             aria-describedby="password-hint"
           />
           <p id="password-hint" className="text-xs text-muted">
-            Mínimo de 6 caracteres.
+            Mínimo de {PASSWORD_MIN_LENGTH} caracteres.
           </p>
         </div>
 
