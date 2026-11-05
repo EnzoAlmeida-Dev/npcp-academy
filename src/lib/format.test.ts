@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { formatDate } from "./format";
+import { formatDate, initials } from "./format";
 
 describe("formatDate", () => {
   it("formata como dd/mm/aaaa", () => {
@@ -13,5 +13,17 @@ describe("formatDate", () => {
 
   it("aceita Date", () => {
     expect(formatDate(new Date("2026-01-15T12:00:00Z"))).toBe("15/01/2026");
+  });
+});
+
+describe("initials", () => {
+  it.each([
+    ["Ana Souza", "AS"],
+    ["Ana Maria de Souza", "AS"],
+    ["ana", "A"],
+    ["  Élida   Núñez ", "ÉN"],
+    ["", "?"],
+  ])("%j vira %j", (name, expected) => {
+    expect(initials(name)).toBe(expected);
   });
 });

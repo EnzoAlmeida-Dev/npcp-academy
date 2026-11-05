@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { CircleCheck } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -46,15 +47,16 @@ export function CreateInvitationForm() {
       </form>
 
       {state.error ? (
-        <FormMessage className="mt-3">{state.error}</FormMessage>
+        <FormMessage className="mt-4">{state.error}</FormMessage>
       ) : null}
 
       {state.inviteUrl ? (
-        <div className="mt-3 rounded-lg border border-success/30 bg-success/10 p-3">
-          <p className="text-sm font-medium text-success">
+        <div className="mt-4 rounded-lg border border-border bg-sheet p-4">
+          <p className="flex items-center gap-2 text-sm text-ink">
+            <CircleCheck aria-hidden="true" className="size-4 text-success" />
             Convite criado. Copie o link e envie à pessoa convidada.
           </p>
-          <p className="mt-1 break-all rounded bg-surface px-2 py-1 text-sm text-ink">
+          <p className="mt-2 break-all rounded-md border border-border bg-surface px-2.5 py-1.5 text-ui text-ink">
             {state.inviteUrl}
           </p>
           <div className="mt-2 flex flex-wrap items-center gap-2">

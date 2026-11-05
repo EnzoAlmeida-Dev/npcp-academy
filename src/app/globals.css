@@ -1,27 +1,72 @@
 @import "tailwindcss";
 
 @theme {
+  /* Cores institucionais: vermelho = acao; azul = onde voce esta. */
   --color-primary: #b81825;
   --color-primary-hover: #a0131f;
   --color-secondary: #1d3561;
+
+  /* Base neutra em tres camadas: moldura > folha > superficie. */
+  --color-canvas: #eeeef0;
+  --color-sheet: #fafafa;
   --color-surface: #ffffff;
-  --color-canvas: #f0f3f6;
-  --color-canvas-alt: #f4f6f9;
-  --color-ink: #101828;
-  --color-muted: #5b6577;
-  --color-border: #e4e7ec;
-  --color-field-border: #7a8599;
+
+  --color-ink: #1c1d21;
+  --color-muted: #5c5e66;
+  --color-on-ink-muted: #a9abb3;
+  --color-border: #e4e4e7;
+  --color-border-strong: #d4d4d8;
+  --color-field-border: #84868e;
+  --color-track: #dcdde2;
 
   --color-success: #067647;
   --color-danger: #b42318;
   --color-warning: #b54708;
   --color-info: #175cd3;
 
+  /* Escala sequencial de um so azul para papeis (ordem: membro < gerencia). */
+  --color-role-member: #7a92bc;
+  --color-role-reviewer: #4d6a9f;
+  --color-role-manager: #1d3561;
+
   --font-heading: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
   --font-body: var(--font-questrial), ui-sans-serif, system-ui, sans-serif;
 
-  --radius-card: 16px;
-  --shadow-card: 0 10px 25px rgba(0, 0, 0, 0.08);
+  --text-ui: 0.8125rem;
+  --text-ui--line-height: 1.25rem;
+
+  /* O raio segue a hierarquia: folha > card > controle. */
+  --radius-sheet: 16px;
+  --radius-card: 12px;
+
+  --shadow-card: 0 1px 2px rgba(28, 29, 33, 0.05);
+  --shadow-raised: 0 1px 2px rgba(28, 29, 33, 0.08);
+  --shadow-overlay: 0 16px 40px rgba(28, 29, 33, 0.18);
+
+  --animate-chevron-in: chevron-in 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-dialog-in: dialog-in 160ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-menu-in: menu-in 140ms ease-out both;
+
+  @keyframes chevron-in {
+    from {
+      opacity: 0;
+      transform: translateX(-8px);
+    }
+  }
+
+  @keyframes dialog-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px) scale(0.985);
+    }
+  }
+
+  @keyframes menu-in {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+  }
 }
 
 body {
@@ -29,14 +74,38 @@ body {
   color: var(--color-ink);
 }
 
-/* Foco padrao; superficies escuras usam anel branco (contraste >= 3:1). */
+/* Foco em azul institucional: contraste >= 3:1 em todas as superficies claras. */
 :focus-visible {
-  outline: 2px solid var(--color-primary);
+  outline: 2px solid var(--color-secondary);
   outline-offset: 2px;
 }
 
-.on-dark :focus-visible {
-  outline-color: #ffffff;
+/* Segmento de progresso em chevron; o primeiro tem o inicio reto. */
+.chevron-segment {
+  clip-path: polygon(
+    0 0,
+    calc(100% - 9px) 0,
+    100% 50%,
+    calc(100% - 9px) 100%,
+    0 100%,
+    9px 50%
+  );
+}
+
+.chevron-segment:first-child {
+  clip-path: polygon(
+    0 0,
+    calc(100% - 9px) 0,
+    100% 50%,
+    calc(100% - 9px) 100%,
+    0 100%
+  );
+}
+
+@media (forced-colors: active) {
+  .chevron-segment {
+    forced-color-adjust: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -44,6 +113,7 @@ body {
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
     transition-duration: 0.01ms !important;
   }
 }

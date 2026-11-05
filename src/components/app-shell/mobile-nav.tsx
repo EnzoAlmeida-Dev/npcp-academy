@@ -1,13 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { LogOut, Menu, UserRound, X } from "lucide-react";
-import Link from "next/link";
+import { Menu, X } from "lucide-react";
 
-import { logoutAction } from "@/features/auth/actions";
 import type { NavItem } from "@/lib/navigation";
 
 import { NavList } from "./nav-list";
+import { UserMenu } from "./user-menu";
 
 export function MobileNav({
   items,
@@ -53,7 +52,7 @@ export function MobileNav({
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-controls="mobile-menu"
-        className="rounded-lg p-2 text-white hover:bg-white/10"
+        className="flex size-10 items-center justify-center rounded-lg text-ink transition-colors duration-150 hover:bg-ink/5"
       >
         <span className="sr-only">{open ? "Fechar menu" : "Abrir menu"}</span>
         {open ? (
@@ -66,30 +65,11 @@ export function MobileNav({
       {open ? (
         <div
           id="mobile-menu"
-          className="absolute left-0 right-0 top-full z-40 bg-secondary px-4 py-3 shadow-card"
+          className="absolute inset-x-0 top-full z-40 animate-menu-in border-b border-border bg-canvas px-3 py-3 shadow-overlay"
         >
           <NavList items={items} onNavigate={() => setOpen(false)} />
-          <div className="mt-3 border-t border-white/10 pt-3">
-            <p className="text-sm text-white">
-              {name} · {role}
-            </p>
-            <Link
-              href="/profile"
-              onClick={() => setOpen(false)}
-              className="mt-2 flex items-center gap-2 py-2 text-sm text-white/80 underline hover:text-white"
-            >
-              <UserRound aria-hidden="true" className="size-4" />
-              Meu perfil
-            </Link>
-            <form action={logoutAction}>
-              <button
-                type="submit"
-                className="inline-flex items-center gap-2 py-2 text-sm text-white/80 underline hover:text-white"
-              >
-                <LogOut aria-hidden="true" className="size-4" />
-                Sair
-              </button>
-            </form>
+          <div className="mt-3 border-t border-border-strong pt-2">
+            <UserMenu name={name} role={role} onNavigate={() => setOpen(false)} />
           </div>
         </div>
       ) : null}

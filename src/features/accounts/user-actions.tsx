@@ -45,6 +45,7 @@ function ChangeRole({
         Papel de {name}
       </label>
       <Select
+        compact
         id={selectId}
         value={selected}
         onChange={(event) => setSelected(event.target.value as Role)}
@@ -58,6 +59,7 @@ function ChangeRole({
       <Button
         type="button"
         variant="secondary"
+        size="sm"
         disabled={selected === role}
         onClick={() => setOpen(true)}
       >
@@ -110,6 +112,7 @@ function ToggleDisabled({
       <Button
         type="button"
         variant={disabled ? "secondary" : "danger"}
+        size="sm"
         onClick={() => setOpen(true)}
       >
         {disabled ? (

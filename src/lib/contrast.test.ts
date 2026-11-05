@@ -22,19 +22,6 @@ function toRgb(hex: string): Rgb {
   return [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)) as Rgb;
 }
 
-/** Cor `fg` com opacidade `alpha` composta sobre `bg`. */
-function blend(fg: string, bg: string, alpha: number): string {
-  const f = toRgb(fg);
-  const b = toRgb(bg);
-  return (
-    "#" +
-    f
-      .map((v, i) => Math.round(v * alpha + b[i] * (1 - alpha)))
-      .map((v) => v.toString(16).padStart(2, "0"))
-      .join("")
-  );
-}
-
 function luminance(hex: string): number {
   const [r, g, b] = toRgb(hex).map((v) => {
     const c = v / 255;
@@ -51,41 +38,50 @@ function ratio(a: string, b: string): number {
 describe("contraste dos tokens (WCAG AA)", () => {
   const surface = token("surface");
   const canvas = token("canvas");
+  const sheet = token("sheet");
+  const ink = token("ink");
+  const muted = token("muted");
   const secondary = token("secondary");
   const primary = token("primary");
 
   it.each([
-    ["texto principal sobre canvas", token("ink"), canvas],
-    ["texto secundario sobre canvas", token("muted"), canvas],
-    ["texto secundario sobre superficie", token("muted"), surface],
+    ["texto principal sobre moldura", ink, canvas],
+    ["texto principal sobre folha", ink, sheet],
+    ["texto secundario sobre moldura", muted, canvas],
+    ["texto secundario sobre folha", muted, sheet],
+    ["texto secundario sobre superficie", muted, surface],
     ["texto branco sobre botao primario", "#ffffff", primary],
     ["texto branco sobre hover do primario", "#ffffff", token("primary-hover")],
-    ["titulos sobre superficie", secondary, surface],
-    ["nav ativa (branco sobre primario)", "#ffffff", primary],
-    ["nav inativa (branco 80% sobre secundario)", blend("#ffffff", secondary, 0.8), secondary],
-    ["'Em breve' (branco 70% sobre secundario)", blend("#ffffff", secondary, 0.7), secondary],
+    ["links sobre superficie", secondary, surface],
+    ["texto branco sobre painel grafite", "#ffffff", ink],
+    ["texto secundario sobre painel grafite", token("on-ink-muted"), ink],
+    ["erro sobre superficie", token("danger"), surface],
+    ["sucesso sobre superficie", token("success"), surface],
+    ["alerta sobre superficie", token("warning"), surface],
+    ["informativo sobre superficie", token("info"), surface],
   ])("%s tem contraste >= 4.5:1", (_name, fg, bg) => {
     expect(ratio(fg, bg)).toBeGreaterThanOrEqual(4.5);
   });
 
-  it.each(["success", "danger", "warning", "info"])(
-    "badge %s tem contraste >= 4.5:1",
-    (tone) => {
-      const color = token(tone);
-      expect(ratio(color, blend(color, surface, 0.1))).toBeGreaterThanOrEqual(
-        4.5,
-      );
-    },
-  );
-
   it.each([
     ["borda de campo sobre superficie", token("field-border"), surface],
-    ["borda de campo sobre canvas", token("field-border"), canvas],
-    ["foco primario sobre superficie", primary, surface],
-    ["foco primario sobre canvas", primary, canvas],
-    ["foco branco sobre secundario", "#ffffff", secondary],
-    ["foco branco sobre primario (item ativo)", "#ffffff", primary],
+    ["borda de campo sobre folha", token("field-border"), sheet],
+    ["foco sobre superficie", secondary, surface],
+    ["foco sobre folha", secondary, sheet],
+    ["foco sobre moldura", secondary, canvas],
+    ["progresso preenchido sobre trilho", secondary, token("track")],
+    ["papel membro sobre superficie", token("role-member"), surface],
+    ["papel responsavel sobre superficie", token("role-reviewer"), surface],
+    ["papel gerencia sobre superficie", token("role-manager"), surface],
   ])("%s tem contraste >= 3:1", (_name, fg, bg) => {
     expect(ratio(fg, bg)).toBeGreaterThanOrEqual(3);
+  });
+
+  it("escala de papeis escurece com a hierarquia", () => {
+    const steps = ["role-member", "role-reviewer", "role-manager"].map((t) =>
+      luminance(token(t)),
+    );
+    expect(steps[0]).toBeGreaterThan(steps[1]);
+    expect(steps[1]).toBeGreaterThan(steps[2]);
   });
 });

@@ -26,7 +26,12 @@ export function RevokeInvitationButton({
 
   return (
     <>
-      <Button type="button" variant="danger" onClick={() => setOpen(true)}>
+      <Button
+        type="button"
+        variant="danger"
+        size="sm"
+        onClick={() => setOpen(true)}
+      >
         <Ban aria-hidden="true" className="size-4" />
         Revogar
         <span className="sr-only"> convite de {email}</span>

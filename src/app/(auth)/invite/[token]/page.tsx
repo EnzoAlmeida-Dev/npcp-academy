@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
+import { AuthLayout } from "@/components/app-shell/auth-layout";
 import { StatusPanel } from "@/components/ui/status-panel";
 import { consumeInvite, getInvitationInfo } from "@/features/invitations/info";
 import { InviteAcceptForm } from "@/features/invitations/invite-accept-form";
@@ -74,9 +75,5 @@ export default async function InvitePage({
     }
   }
 
-  return (
-    <main className="flex min-h-screen items-center justify-center bg-canvas p-4">
-      <div className="w-full max-w-sm">{content}</div>
-    </main>
-  );
+  return <AuthLayout>{content}</AuthLayout>;
 }

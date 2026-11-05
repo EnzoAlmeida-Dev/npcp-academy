@@ -1,9 +1,6 @@
 import type { ReactNode } from "react";
-import { LogOut, UserRound } from "lucide-react";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { logoutAction } from "@/features/auth/actions";
 import { ROLE_LABELS } from "@/lib/auth/roles";
 import { getCurrentProfile } from "@/lib/auth/session";
 import { getNavItemsForRole } from "@/lib/navigation";
@@ -11,14 +8,13 @@ import { createClient } from "@/lib/supabase/server";
 
 import { MobileNav } from "./mobile-nav";
 import { NavList } from "./nav-list";
+import { UserMenu } from "./user-menu";
 
-function Brand() {
+function Wordmark() {
   return (
-    <div className="px-6 py-5">
-      <span className="font-heading text-lg font-bold text-white">
-        NPCP Academy
-      </span>
-    </div>
+    <span className="font-heading text-[15px] font-semibold tracking-tight text-ink">
+      NPCP Academy
+    </span>
   );
 }
 
@@ -45,49 +41,35 @@ export default async function AppShell({
   const roleLabel = ROLE_LABELS[profile.role];
 
   return (
-    <div className="min-h-screen lg:flex">
+    <div className="flex min-h-screen flex-col bg-canvas lg:flex-row">
       <a
         href="#conteudo"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-surface focus:px-4 focus:py-2 focus:text-secondary"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-surface focus:px-4 focus:py-2 focus:text-ink focus:shadow-overlay"
       >
         Pular para o conteúdo
       </a>
 
-      <aside className="on-dark hidden w-64 shrink-0 flex-col bg-secondary lg:sticky lg:top-0 lg:flex lg:h-screen">
-        <Brand />
-        <div className="flex-1 overflow-y-auto px-3">
+      <aside className="hidden w-60 shrink-0 flex-col lg:sticky lg:top-0 lg:flex lg:h-screen">
+        <div className="px-5 pb-5 pt-6">
+          <Wordmark />
+        </div>
+        <div className="flex-1 overflow-y-auto px-2.5">
           <NavList items={items} />
         </div>
-        <div className="border-t border-white/10 px-6 py-4">
-          <p className="text-sm font-medium text-white">{name}</p>
-          <p className="text-xs text-white/70">{roleLabel}</p>
-          <Link
-            href="/profile"
-            className="mt-2 flex items-center gap-2 py-1 text-sm text-white/80 underline hover:text-white"
-          >
-            <UserRound aria-hidden="true" className="size-4" />
-            Meu perfil
-          </Link>
-          <form action={logoutAction}>
-            <button
-              type="submit"
-              className="inline-flex items-center gap-2 py-1 text-sm text-white/80 underline hover:text-white"
-            >
-              <LogOut aria-hidden="true" className="size-4" />
-              Sair
-            </button>
-          </form>
+        <div className="p-2.5">
+          <UserMenu name={name} role={roleLabel} />
         </div>
       </aside>
 
-      <div className="flex min-w-0 flex-1 flex-col">
-        <header className="on-dark relative flex items-center justify-between bg-secondary px-4 py-3 lg:hidden">
-          <span className="font-heading text-lg font-bold text-white">
-            NPCP Academy
-          </span>
+      <div className="flex min-w-0 flex-1 flex-col lg:py-2 lg:pr-2">
+        <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-canvas px-4 lg:hidden">
+          <Wordmark />
           <MobileNav items={items} name={name} role={roleLabel} />
         </header>
-        <main id="conteudo" className="flex-1 p-4 sm:p-6">
+        <main
+          id="conteudo"
+          className="flex-1 bg-sheet px-4 py-6 sm:px-8 sm:py-8 lg:rounded-sheet lg:border lg:border-border lg:shadow-card"
+        >
           <div className="mx-auto w-full max-w-5xl">{children}</div>
         </main>
       </div>

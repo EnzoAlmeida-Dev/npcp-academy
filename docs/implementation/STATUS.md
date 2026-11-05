@@ -2,9 +2,8 @@
 
 Documento vivo: atualizar ao concluir cada etapa. Serve para retomar o trabalho sem depender do histórico de conversa com o agente. Não contém segredos.
 
-- **Atualizado em:** 2026-11-03.
-- **Último commit de código:** `83ebd2d` (2026-10-18).
-- **Fases concluídas:** 1 (fundação), 2 (identidade e convites) e 2b (contas e qualidade, implementada localmente; migração ainda não aplicada em produção). Ver `IMPLEMENTATION_PLAN.md`.
+- **Atualizado em:** 2026-11-05.
+- **Fases concluídas:** 1 (fundação), 2 (identidade e convites) e 2b (contas e qualidade, em produção). Ver `IMPLEMENTATION_PLAN.md`.
 
 ## Ambientes
 | Item | Estado |
@@ -13,7 +12,7 @@ Documento vivo: atualizar ao concluir cada etapa. Serve para retomar o trabalho 
 | Supabase | Projeto em nuvem `npcp-academy` (ref `vzkhvbygaodtrmhsputz`), região São Paulo |
 | E-mail de Auth | SMTP Resend configurado; confirmação de e-mail ativa; redirects na allowlist |
 | Primeiro gerente | Criado via `seed:manager` |
-| Migrações | 7 no repositório. Na nuvem: as 6 primeiras (a 6ª confirmada pelo funcionamento de `/admin/users` em produção); **`20261103120000_account_management` pendente** — sem ela, Boas-vindas, Meu perfil e as ações de Usuários falham em produção |
+| Migrações | 7 no repositório, todas aplicadas na nuvem. A 7ª foi aplicada pelo SQL Editor e registrada em `schema_migrations`, porque a rede local bloqueia a porta do Postgres (`db push` trava) |
 
 ## O que está implementado
 
@@ -48,19 +47,19 @@ Ver seção "Implementado" de `docs/architecture/DATA_MODEL.md`.
 | `20261103120000_account_management` | `account_events`, `set_display_name`, `get_my_account_status`, `change_user_role`, `set_user_disabled` |
 
 ### UI
-Design system (tokens, fontes, componentes base, app shell responsivo, ícones Lucide, estados de página, diálogo de confirmação). Ver `docs/design/DESIGN_SYSTEM.md`.
+Design system (base neutra, cor com função, progresso em chevrons, superfícies em camadas, ícones Lucide, estados de página, diálogo de confirmação). Ver `docs/design/DESIGN_SYSTEM.md`. O dashboard mostra só dados reais: primeiros passos para todos e, para a gerência, contas por status e papel e convites em aberto.
 
 Revisão de UI/UX em 2026-11-03: foco visível em superfícies escuras, bordas de campo e texto secundário com contraste AA, `<nav>` e link "pular para o conteúdo", sidebar fixa, títulos por página, mensagem de erro de confirmação no login, `loading`/`error`/`not-found`, confirmação ao revogar convite, botão de copiar link, mostrar/ocultar senha e datas nas listas administrativas.
 
 ## Testes
 | Tipo | Conteúdo | Como rodar |
 |---|---|---|
-| Unitários/componente (Vitest) | 59 testes: papéis, token, navegação, contraste dos tokens, datas, componentes interativos, validação de nome e senha, mensagens de erro, redirecionamento seguro | `npm test` |
+| Unitários/componente (Vitest) | 77 testes: papéis, token, navegação, contraste dos tokens, datas, componentes interativos, progresso em chevrons, resumo do dashboard, validação de nome e senha, mensagens de erro, redirecionamento seguro | `npm test` |
 | Integração (Vitest + Supabase local) | 24 testes: alteração de papel (permitido/negado, próprio papel, conta não ativada, **concorrência entre dois gerentes**), desativação com sessão válida, reativação, histórico de eventos, nome de exibição, perfil alheio, RLS e consumo de convites (válido, reuso, e-mail divergente, expirado, em nome de outro) | `npm run test:integration` |
 | Manual — e-mail | 9 verificações do convite com Mailpit | `node --env-file-if-exists=.env.development.local scripts/e2e-invite-email.mjs` |
 | CI | Os dois primeiros, mais lint, typecheck e build, a cada push/PR | `.github/workflows/ci.yml` |
 
-Última execução (2026-11-03, local): lint OK; typecheck OK; `npm test` 59/59; `npm run test:integration` 24/24 em 4 execuções seguidas; `e2e-invite-email` 9/9; `npm run build` OK; rotas públicas e redirecionamentos conferidos com o app rodando contra o Supabase local. **Não executados:** o workflow de CI no GitHub (roda no próximo push), o fluxo autenticado no navegador (Boas-vindas, Meu perfil, ações de Usuários) e a recuperação de senha com e-mail real.
+Última execução (2026-11-05, local): lint OK; typecheck OK; `npm test` 77/77; `npm run test:integration` 24/24; `npm run build` OK. O CI do GitHub passou no push da Fase 2b. Telas autenticadas conferidas em Chrome real contra o Supabase local no redesign (2026-11-05), em desktop e celular. **Não executado:** recuperação de senha com e-mail real em produção.
 
 ### Cobertura de critérios de aceitação
 | AC | Estado |
@@ -80,17 +79,16 @@ Revisão de UI/UX em 2026-11-03: foco visível em superfícies escuras, bordas d
 | Demais | Não implementados |
 
 ## Lacunas conhecidas
-1. Migração `20261103120000_account_management` não aplicada na nuvem (exige autorização).
-2. Senha mínima de 8 no painel do Supabase em nuvem não ajustada.
-3. Recuperação de senha depende do link ser aberto no mesmo navegador (PKCE); confirmar com e-mail real em produção.
-4. Não há visualização do histórico `account_events` na interface (só no banco).
-5. `seed.sql` vazio; seed fictício da trilha piloto pendente (Fase 3).
-6. RLS de `profiles` só permite ler o próprio perfil (ou tudo, para gerência); fila e ranking exigirão leitura restrita de nomes (ver `DATA_MODEL.md`).
+1. Confirmar a senha mínima de 8 no painel do Supabase em nuvem.
+2. Recuperação de senha depende do link ser aberto no mesmo navegador (PKCE); confirmar com e-mail real em produção.
+3. Não há visualização do histórico `account_events` na interface (só no banco).
+4. `seed.sql` vazio; seed fictício da trilha piloto pendente (Fase 3).
+5. RLS de `profiles` só permite ler o próprio perfil (ou tudo, para gerência); fila e ranking exigirão leitura restrita de nomes (ver `DATA_MODEL.md`).
 
 ## Riscos
 - **Desenvolvimento contra produção:** sem Supabase local rodando, `npm run dev` usa `.env.local`, que aponta para o projeto em nuvem de produção. Testes manuais e scripts podem criar dados reais. Mitigação: usar o Supabase local para desenvolvimento ou criar um projeto separado de dev.
 - `SUPABASE_SERVICE_ROLE_KEY` não é usada pela aplicação em execução; se estiver configurada no Vercel, pode ser removida.
-- Se a aplicação for publicada antes da migração, Boas-vindas falha para quem não tem nome e bloqueia o acesso dessas contas.
+- Migração sempre antes do push na `main`: o Vercel publica a `main`, e código que depende de função ainda inexistente na nuvem quebra em produção.
 - Planos gratuitos: Supabase pode pausar por inatividade; limites de e-mail do Resend.
 
 ## Armadilhas operacionais
@@ -112,4 +110,5 @@ Revisão de UI/UX em 2026-11-03: foco visível em superfícies escuras, bordas d
 | 2026-10-18 | Confirmação PKCE, fallback local/nuvem, design system, lista de usuários, fallback de consumo no login |
 | 2026-11-03 | Deploy no Vercel com domínio e Resend; revisão da documentação e registro de decisões D17–D34 |
 | 2026-11-03 | Revisão de UI/UX (acessibilidade, estados de página, confirmação de ações) |
-| 2026-11-03 | Fase 2b local: nome obrigatório, Meu perfil, recuperação de senha, gestão de papéis/status, senha mínima 8, suíte de integração e CI; decisões D35–D37 |
+| 2026-11-05 | Fase 2b em produção: nome obrigatório, Meu perfil, recuperação de senha, gestão de papéis/status, senha mínima 8, suíte de integração e CI; decisões D35–D37 |
+| 2026-11-05 | Redesign Modern Learning SaaS em todas as telas |

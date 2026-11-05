@@ -13,14 +13,13 @@ export function ErrorState({
   return (
     <div
       role="alert"
-      className="rounded-card border border-danger/40 bg-surface p-8 text-center shadow-card"
+      className="rounded-card border border-border bg-surface p-8 shadow-card"
     >
-      <TriangleAlert
-        aria-hidden="true"
-        className="mx-auto mb-3 size-8 text-danger"
-      />
-      <p className="font-heading font-semibold text-secondary">{title}</p>
-      <p className="mt-1 text-sm text-muted">{description}</p>
+      <TriangleAlert aria-hidden="true" className="mb-3 size-5 text-danger" />
+      <p className="font-heading text-base font-semibold tracking-tight text-ink">
+        {title}
+      </p>
+      <p className="mt-1 max-w-prose text-sm text-muted">{description}</p>
       {children ? <div className="mt-4">{children}</div> : null}
     </div>
   );

@@ -3,7 +3,6 @@
 import { useActionState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { FormMessage } from "@/components/ui/form-message";
 import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/password-input";
@@ -37,8 +36,8 @@ export function InviteAcceptForm({
   }
 
   return (
-    <Card>
-      <h1 className="mb-6 text-center font-heading text-2xl font-bold text-secondary">
+    <>
+      <h1 className="mb-8 font-heading text-2xl font-semibold tracking-tight text-ink">
         Aceitar convite
       </h1>
 
@@ -46,8 +45,8 @@ export function InviteAcceptForm({
         <input type="hidden" name="token" value={token} />
 
         <div className="flex flex-col gap-1">
-          <span className="text-sm text-muted">E-mail convidado</span>
-          <span className="font-medium text-ink">{email}</span>
+          <span className="text-ui text-muted">E-mail convidado</span>
+          <span className="break-words text-sm text-ink">{email}</span>
         </div>
 
         <div className="flex flex-col gap-1.5">
@@ -72,6 +71,6 @@ export function InviteAcceptForm({
           {pending ? "Criando..." : "Criar conta"}
         </Button>
       </form>
-    </Card>
+    </>
   );
 }

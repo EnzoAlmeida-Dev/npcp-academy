@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { getNavItemsForRole, NAV_ITEMS } from "./navigation";
+import { getNavItemsForRole, groupNavItems, NAV_ITEMS } from "./navigation";
 
 describe("navegacao por papel", () => {
   it("member ve apenas itens de member", () => {
@@ -26,5 +26,18 @@ describe("navegacao por papel", () => {
     for (const item of NAV_ITEMS) {
       expect(keys).toContain(item.key);
     }
+  });
+});
+
+describe("groupNavItems", () => {
+  it("membro tem uma unica secao", () => {
+    const groups = groupNavItems(getNavItemsForRole("member"));
+    expect(groups.map((g) => g.section)).toEqual(["learn"]);
+  });
+
+  it("gerente ve as secoes em ordem, sem perder itens", () => {
+    const groups = groupNavItems(getNavItemsForRole("manager"));
+    expect(groups.map((g) => g.section)).toEqual(["learn", "review", "admin"]);
+    expect(groups.flatMap((g) => g.items)).toHaveLength(NAV_ITEMS.length);
   });
 });

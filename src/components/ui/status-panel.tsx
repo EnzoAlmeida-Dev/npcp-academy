@@ -1,15 +1,22 @@
 import type { ReactNode } from "react";
+import {
+  CircleAlert,
+  CircleCheck,
+  Info,
+  TriangleAlert,
+  type LucideIcon,
+} from "lucide-react";
 
 import { cn } from "@/lib/cn";
 
 import type { BadgeTone } from "./badge";
 
-const accents: Record<BadgeTone, string> = {
-  neutral: "border-border",
-  success: "border-success/40",
-  danger: "border-danger/40",
-  warning: "border-warning/40",
-  info: "border-info/40",
+const tones: Record<BadgeTone, { icon: LucideIcon; color: string }> = {
+  neutral: { icon: Info, color: "text-muted" },
+  success: { icon: CircleCheck, color: "text-success" },
+  danger: { icon: CircleAlert, color: "text-danger" },
+  warning: { icon: TriangleAlert, color: "text-warning" },
+  info: { icon: Info, color: "text-info" },
 };
 
 export function StatusPanel({
@@ -23,14 +30,14 @@ export function StatusPanel({
   tone?: BadgeTone;
   children?: ReactNode;
 }) {
+  const { icon: Icon, color } = tones[tone];
+
   return (
-    <div
-      className={cn(
-        "rounded-card border bg-surface p-6 shadow-card",
-        accents[tone],
-      )}
-    >
-      <h1 className="font-heading text-xl font-bold text-secondary">{title}</h1>
+    <div>
+      <Icon aria-hidden="true" className={cn("mb-4 size-6", color)} />
+      <h1 className="font-heading text-2xl font-semibold tracking-tight text-ink">
+        {title}
+      </h1>
       {message ? <p className="mt-2 text-sm text-muted">{message}</p> : null}
       {children}
     </div>

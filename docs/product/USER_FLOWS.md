@@ -13,7 +13,7 @@ Referências `Dnn` apontam para `DECISIONS.md`. A navegação apenas reflete as 
 | Nova senha | `/reset-password` | sessão (link de recuperação ou logado) | Implementada |
 | Boas-vindas (nome obrigatório) | `/welcome` | member ativo sem nome | Implementada |
 | Meu perfil | `/profile` | member | Implementada |
-| Dashboard | `/dashboard` | member | Implementada (conteúdo provisório) |
+| Dashboard | `/dashboard` | member | Implementada (primeiros passos; visão geral para a gerência) |
 | Trilhas → módulos → atividades | `/paths` | member | Planejada (Fase 3) |
 | Competências | `/competencies` | member | Planejada (Fase 6) |
 | Perfil, XP e ranking | a definir | member | Planejada (Fase 6) |

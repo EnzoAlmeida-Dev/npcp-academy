@@ -3,7 +3,7 @@
 Fonte única para decisões de produto, regras de negócio e política. Os demais
 documentos referenciam os IDs abaixo em vez de repetir ou reinterpretar a decisão.
 
-- **Atualizado em:** 2026-11-03 (rodada 2).
+- **Atualizado em:** 2026-11-05.
 - IDs são estáveis: não renumerar. Nova decisão recebe o próximo ID livre.
 - Status: **Decidida** (validada pelo responsável do produto), **Suposição**
   (proposta de baixo impacto e reversível, adotada até confirmação),
@@ -20,11 +20,11 @@ documentos referenciam os IDs abaixo em vez de repetir ou reinterpretar a decis�
 | D6 | O primeiro gerente é criado por procedimento controlado (`npm run seed:manager`), nunca por cadastro público. | Decidida | Implementada |
 | D7 | Convite é entregue por link copiável; o sistema não envia e-mail de convite. | Decidida | Implementada |
 | D8 | Recuperação de senha nativa do Supabase Auth, por e-mail (SMTP Resend). | Decidida | Implementada |
-| D9 | Desativação de conta pela gerência preenche `disabled_at` e bloqueia o acesso (servidor + RLS). Os dados do usuário são mantidos. | Decidida | Implementada (migração pendente em produção) |
-| D21 | Continuidade: a gerência atual repassa os papéis de gerência e de responsável técnico às próximas levas pela própria plataforma. Somente a gerência altera papéis de outras pessoas, na tela de Usuários. | Decidida | Implementada (migração pendente em produção) |
+| D9 | Desativação de conta pela gerência preenche `disabled_at` e bloqueia o acesso (servidor + RLS). Os dados do usuário são mantidos. | Decidida | Implementada |
+| D21 | Continuidade: a gerência atual repassa os papéis de gerência e de responsável técnico às próximas levas pela própria plataforma. Somente a gerência altera papéis de outras pessoas, na tela de Usuários. | Decidida | Implementada |
 | D22 | Confirmação de e-mail obrigatória antes da ativação. O token do convite não substitui a confirmação. (Antiga "decisão A".) | Decidida | Implementada |
-| D28 | Nome de exibição é obrigatório e definido após a criação da conta, antes do uso da plataforma. O usuário pode editá-lo depois. Tamanho: 2 a 60 caracteres (Suposição). | Decidida | Implementada (migração pendente em produção) |
-| D29 | Deve existir sempre ao menos um gerente ativo: não é permitido rebaixar ou desativar o último. Ninguém altera o próprio papel nem desativa a própria conta. | Decidida | Implementada (migração pendente em produção) |
+| D28 | Nome de exibição é obrigatório e definido após a criação da conta, antes do uso da plataforma. O usuário pode editá-lo depois. Tamanho: 2 a 60 caracteres (Suposição). | Decidida | Implementada |
+| D29 | Deve existir sempre ao menos um gerente ativo: não é permitido rebaixar ou desativar o último. Ninguém altera o próprio papel nem desativa a própria conta. | Decidida | Implementada |
 | D30 | O usuário pode excluir a própria conta. São apagados os dados pessoais da conta: perfil, credenciais, progresso em trilhas, submissões próprias, XP e competências. As revisões que a pessoa fez em entregas de outras pessoas **são mantidas, com o nome do autor** (o registro de revisão guarda uma cópia do nome do revisor). | Decidida | Pendente (Fase 8) |
 | D34 | Haverá termos de uso e aviso de privacidade (inclusive o que a gerência vê de cada membro), aceitos no primeiro acesso. O texto será proposto pelo agente e validado pelo responsável do produto. | Decidida (texto: pendente) | Pendente (Fase 8) |
 | D36 | Senha mínima de 8 caracteres para senhas novas ou redefinidas. Contas existentes não precisam trocar a senha. | Decidida | Implementada na aplicação; falta ajustar o painel do Supabase em nuvem |

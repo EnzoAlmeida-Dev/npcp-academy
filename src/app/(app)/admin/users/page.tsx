@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { Avatar } from "@/components/ui/avatar";
 import { Badge, type BadgeTone } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -15,7 +16,7 @@ function statusOf(user: AdminUser): { label: string; tone: BadgeTone } {
     return { label: "Desativado", tone: "danger" };
   }
   if (!user.activated_at) {
-    return { label: "Inativo", tone: "warning" };
+    return { label: "Aguardando ativação", tone: "warning" };
   }
   return { label: "Ativo", tone: "success" };
 }
@@ -44,10 +45,10 @@ export default async function AdminUsersPage() {
       {users.length === 0 ? (
         <EmptyState
           title="Nenhum usuário"
-          description="Nenhuma conta encontrada ainda."
+          description="Convide a primeira pessoa em Convites."
         />
       ) : (
-        <Card className="overflow-hidden p-0">
+        <Card flush>
           <ul className="divide-y divide-border">
             {users.map((user) => {
               const status = statusOf(user);
@@ -56,33 +57,44 @@ export default async function AdminUsersPage() {
               return (
                 <li
                   key={user.id}
-                  className="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
+                  className="flex flex-col gap-3 px-4 py-3.5 transition-colors duration-150 hover:bg-sheet lg:flex-row lg:items-center lg:justify-between lg:gap-6"
                 >
-                  <div className="min-w-0">
-                    <p className="truncate font-medium text-ink">
-                      {user.display_name ?? "Sem nome"}
-                    </p>
-                    <p className="truncate text-sm text-muted">
-                      {user.email ?? "—"}
-                      {user.activated_at
-                        ? ` · ativo desde ${formatDate(user.activated_at)}`
-                        : ""}
-                    </p>
-                  </div>
-                  <div className="flex shrink-0 flex-col gap-2 sm:items-end">
-                    <div className="flex flex-wrap items-center gap-2">
-                      {isSelf ? <Badge tone="neutral">Você</Badge> : null}
-                      <Badge tone="info">{ROLE_LABELS[user.role]}</Badge>
-                      <Badge tone={status.tone}>{status.label}</Badge>
+                  <div className="flex min-w-0 items-center gap-3">
+                    <Avatar name={name} />
+                    <div className="min-w-0">
+                      <p className="truncate text-sm text-ink">
+                        {user.display_name ?? "Sem nome"}
+                        {isSelf ? (
+                          <span className="text-muted"> (você)</span>
+                        ) : null}
+                      </p>
+                      <p className="truncate text-ui text-muted">
+                        {user.email ?? "—"}
+                      </p>
                     </div>
-                    {!isSelf && user.activated_at ? (
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-2 lg:justify-end">
+                    <div className="flex flex-col items-start gap-0.5 lg:items-end">
+                      <Badge tone={status.tone}>{status.label}</Badge>
+                      {user.activated_at ? (
+                        <span className="text-xs text-muted">
+                          Desde {formatDate(user.activated_at)}
+                        </span>
+                      ) : null}
+                    </div>
+                    {isSelf || !user.activated_at ? (
+                      <span className="text-ui text-muted">
+                        {ROLE_LABELS[user.role]}
+                      </span>
+                    ) : (
                       <UserActions
                         userId={user.id}
                         name={name}
                         role={user.role}
                         disabled={user.disabled_at !== null}
                       />
-                    ) : null}
+                    )}
                   </div>
                 </li>
               );

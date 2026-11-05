@@ -79,7 +79,7 @@ export function ConfirmDialog({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/50 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 p-4"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) {
           onClose();
@@ -92,11 +92,11 @@ export function ConfirmDialog({
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={description ? descId : undefined}
-        className="w-full max-w-md rounded-card border border-border bg-surface p-6 shadow-card"
+        className="w-full max-w-md animate-dialog-in rounded-card border border-border bg-surface p-6 shadow-overlay"
       >
         <h2
           id={titleId}
-          className="font-heading text-lg font-bold text-secondary"
+          className="font-heading text-lg font-semibold tracking-tight text-ink"
         >
           {title}
         </h2>

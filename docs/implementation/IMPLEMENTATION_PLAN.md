@@ -7,8 +7,8 @@ Estado atual de cada fase em `STATUS.md`. Referências `Dnn` apontam para `docs/
 | 0 | Alinhamento | Concluída (pendências listadas em `DECISIONS.md`) | — |
 | 1 | Fundação | Concluída | — |
 | 2 | Identidade e convites | Concluída | — |
-| 2b | Contas e qualidade | Implementada (falta aplicar a migração em produção) | D28, D29, D36, D37 |
-| 3 | Conteúdo e trilhas | Planejada | D23–D27; D32/D33 durante a fase |
+| 2b | Contas e qualidade | Concluída | D28, D29, D36, D37 |
+| 3 | Conteúdo e trilhas | Próxima | D23–D27; D32/D33 durante a fase |
 | 4 | Progresso e autodeclaração | Planejada | D10, D15, D24 |
 | 5 | Submissões e revisão | Planejada | D3, D4, D19, D25 |
 | 6 | Competências e gamificação | Planejada | D2, D11, D12, D16, D20; **D13, D14 abertas** |
@@ -21,7 +21,7 @@ Projeto, lint, typecheck, testes, estrutura de features, ambientes, conexão com
 ## Fase 2 — Identidade e convites (concluída)
 Login/logout, criação, consumo, expiração e revogação de convites, perfis e papéis, autorização no servidor e RLS, confirmação de e-mail.
 
-## Fase 2b — Contas e qualidade (implementada)
+## Fase 2b — Contas e qualidade (concluída)
 Implementar:
 - etapa obrigatória de nome de exibição após ativação e edição posterior (D28);
 - recuperação de senha (D8);

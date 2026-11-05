@@ -40,8 +40,7 @@ export function DisplayNameForm({
           aria-describedby="display_name-hint"
         />
         <p id="display_name-hint" className="text-xs text-muted">
-          Aparece no ranking e para quem revisa suas entregas. Entre{" "}
-          {DISPLAY_NAME_MIN} e {DISPLAY_NAME_MAX} caracteres.
+          Entre {DISPLAY_NAME_MIN} e {DISPLAY_NAME_MAX} caracteres.
         </p>
       </div>
 

@@ -8,8 +8,8 @@ import { CreateInvitationForm } from "@/features/invitations/create-invitation-f
 import { listInvitations } from "@/features/invitations/queries";
 import { RevokeInvitationButton } from "@/features/invitations/revoke-invitation-button";
 import { requireRole } from "@/lib/auth/authorize";
-import { formatDate } from "@/lib/format";
 import { ROLE_LABELS } from "@/lib/auth/roles";
+import { formatDate } from "@/lib/format";
 
 function invitationStatus(inv: {
   used_at: string | null;
@@ -17,7 +17,7 @@ function invitationStatus(inv: {
   expires_at: string;
 }): { label: string; tone: BadgeTone } {
   if (inv.used_at) {
-    return { label: "Utilizado", tone: "neutral" };
+    return { label: "Utilizado", tone: "success" };
   }
   if (inv.revoked_at) {
     return { label: "Revogado", tone: "danger" };
@@ -46,7 +46,7 @@ export default async function AdminInvitationsPage() {
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Convites"
-        description="Crie e gerencie convites de acesso."
+        description="Crie um convite e envie o link para a pessoa. Cada link funciona uma vez."
       />
 
       <CreateInvitationForm />
@@ -57,28 +57,28 @@ export default async function AdminInvitationsPage() {
           description="Crie o primeiro convite acima."
         />
       ) : (
-        <Card className="overflow-hidden p-0">
+        <Card flush>
           <ul className="divide-y divide-border">
             {invitations.map((inv) => {
               const status = invitationStatus(inv);
               return (
                 <li
                   key={inv.id}
-                  className="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
+                  className="flex flex-col gap-3 px-4 py-3.5 transition-colors duration-150 hover:bg-sheet sm:flex-row sm:items-center sm:justify-between sm:gap-6"
                 >
                   <div className="min-w-0">
-                    <p className="truncate font-medium text-ink">
+                    <p className="truncate text-sm text-ink">
                       {inv.email_normalized}
                     </p>
-                    <p className="text-sm text-muted">
-                      {ROLE_LABELS[inv.role]} · criado em{" "}
-                      {formatDate(inv.created_at)} · válido até{" "}
+                    <p className="text-ui text-muted">
+                      {ROLE_LABELS[inv.role]}, criado em{" "}
+                      {formatDate(inv.created_at)}, válido até{" "}
                       {formatDate(inv.expires_at)}
                     </p>
                   </div>
-                  <div className="flex shrink-0 items-center gap-2">
+                  <div className="flex shrink-0 items-center gap-3">
                     <Badge tone={status.tone}>{status.label}</Badge>
-                    {inv.used_at === null && inv.revoked_at === null ? (
+                    {status.label === "Aguardando" ? (
                       <RevokeInvitationButton
                         id={inv.id}
                         email={inv.email_normalized}

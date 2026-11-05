@@ -1,14 +1,36 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import type { ReactNode } from "react";
 
 import { Card } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
+import { SectionTitle } from "@/components/ui/section-title";
 import { DisplayNameForm } from "@/features/accounts/display-name-form";
 import { ROLE_LABELS } from "@/lib/auth/roles";
 import { getCurrentProfile } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Meu perfil" };
+
+function Section({
+  title,
+  help,
+  children,
+}: {
+  title: string;
+  help: string;
+  children: ReactNode;
+}) {
+  return (
+    <Card className="grid gap-6 md:grid-cols-[14rem_minmax(0,1fr)]">
+      <div>
+        <SectionTitle>{title}</SectionTitle>
+        <p className="mt-1 text-ui text-muted">{help}</p>
+      </div>
+      <div className="max-w-md">{children}</div>
+    </Card>
+  );
+}
 
 export default async function ProfilePage() {
   const profile = await getCurrentProfile();
@@ -23,42 +45,38 @@ export default async function ProfilePage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader title="Meu perfil" description="Seus dados na plataforma." />
+      <PageHeader title="Meu perfil" />
 
-      <Card>
-        <h2 className="mb-4 font-heading text-lg font-semibold text-secondary">
-          Nome de exibição
-        </h2>
+      <Section
+        title="Como você aparece"
+        help="Seu nome no ranking e para quem revisa suas entregas."
+      >
         <DisplayNameForm
           mode="profile"
           defaultValue={profile.display_name ?? ""}
         />
-      </Card>
+      </Section>
 
-      <Card>
-        <h2 className="mb-4 font-heading text-lg font-semibold text-secondary">
-          Conta
-        </h2>
-        <dl className="grid gap-3 text-sm sm:grid-cols-[10rem_1fr]">
+      <Section
+        title="Conta"
+        help="O e-mail e o papel vêm do convite. Para alterá-los, fale com a gerência."
+      >
+        <dl className="grid gap-3 text-sm sm:grid-cols-[6rem_minmax(0,1fr)]">
           <dt className="text-muted">E-mail</dt>
-          <dd className="text-ink">{user?.email ?? "—"}</dd>
+          <dd className="break-words text-ink">{user?.email ?? "—"}</dd>
           <dt className="text-muted">Papel</dt>
           <dd className="text-ink">{ROLE_LABELS[profile.role]}</dd>
           <dt className="text-muted">Senha</dt>
           <dd>
             <Link
               href="/reset-password"
-              className="text-secondary underline hover:text-primary"
+              className="text-secondary underline underline-offset-2 transition-colors duration-150 hover:text-primary"
             >
               Alterar senha
             </Link>
           </dd>
         </dl>
-        <p className="mt-4 text-xs text-muted">
-          O e-mail e o papel são definidos pelo convite. Para alterá-los, fale
-          com a gerência.
-        </p>
-      </Card>
+      </Section>
     </div>
   );
 }

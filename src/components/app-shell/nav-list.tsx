@@ -4,9 +4,56 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { cn } from "@/lib/cn";
-import type { NavItem } from "@/lib/navigation";
+import { groupNavItems, type NavItem } from "@/lib/navigation";
 
 import { NavIcon } from "./nav-icons";
+
+function Item({
+  item,
+  pathname,
+  onNavigate,
+}: {
+  item: NavItem;
+  pathname: string;
+  onNavigate?: () => void;
+}) {
+  if (item.status === "soon") {
+    return (
+      <span className="flex h-9 items-center gap-2.5 rounded-lg px-2.5 text-sm text-muted">
+        <NavIcon name={item.key} />
+        <span className="flex-1">
+          {item.label}
+          <span className="sr-only"> (em breve)</span>
+        </span>
+        <span aria-hidden="true" className="text-xs">
+          Em breve
+        </span>
+      </span>
+    );
+  }
+
+  const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+
+  return (
+    <Link
+      href={item.href}
+      onClick={onNavigate}
+      aria-current={active ? "page" : undefined}
+      className={cn(
+        "flex h-9 items-center gap-2.5 rounded-lg border px-2.5 text-sm transition-colors duration-150",
+        active
+          ? "border-border bg-surface text-ink shadow-card"
+          : "border-transparent text-muted hover:bg-ink/5 hover:text-ink",
+      )}
+    >
+      <NavIcon
+        name={item.key}
+        className={cn("size-4 shrink-0", active && "text-primary")}
+      />
+      {item.label}
+    </Link>
+  );
+}
 
 export function NavList({
   items,
@@ -16,54 +63,24 @@ export function NavList({
   onNavigate?: () => void;
 }) {
   const pathname = usePathname();
+  const groups = groupNavItems(items);
 
   return (
-    <nav aria-label="Principal">
-      <ul className="flex flex-col gap-1">
-        {items.map((item) => {
-          if (item.status === "soon") {
-            return (
+    <nav aria-label="Principal" className="flex flex-col gap-5">
+      {groups.map((group) => (
+        <div key={group.section}>
+          {groups.length > 1 ? (
+            <p className="mb-1 px-2.5 text-xs text-muted">{group.label}</p>
+          ) : null}
+          <ul className="flex flex-col gap-0.5">
+            {group.items.map((item) => (
               <li key={item.key}>
-                <span className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white/70">
-                  <NavIcon name={item.key} />
-                  <span className="flex-1">
-                    {item.label}
-                    <span className="sr-only"> (em breve)</span>
-                  </span>
-                  <span
-                    aria-hidden="true"
-                    className="rounded-full bg-white/10 px-2 py-0.5 text-xs"
-                  >
-                    Em breve
-                  </span>
-                </span>
+                <Item item={item} pathname={pathname} onNavigate={onNavigate} />
               </li>
-            );
-          }
-
-          const active =
-            pathname === item.href || pathname.startsWith(`${item.href}/`);
-
-          return (
-            <li key={item.key}>
-              <Link
-                href={item.href}
-                onClick={onNavigate}
-                aria-current={active ? "page" : undefined}
-                className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                  active
-                    ? "bg-primary text-white"
-                    : "text-white/80 hover:bg-white/10 hover:text-white",
-                )}
-              >
-                <NavIcon name={item.key} />
-                {item.label}
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+            ))}
+          </ul>
+        </div>
+      ))}
     </nav>
   );
 }
