@@ -1,0 +1,57 @@
+name: CI
+
+# Qualidade e testes a cada push e pull request (D37).
+# Nunca acessa o Supabase de producao: os testes de integracao usam um
+# Supabase local criado no proprio runner.
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Lint, tipos, testes e build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+        env:
+          # Valores ficticios: o build nao se conecta ao Supabase.
+          NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:55421
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ci-placeholder
+          APP_URL: http://127.0.0.1:3000
+
+  integration:
+    name: Integracao (RLS e funcoes SQL)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Iniciar Supabase local (aplica as migracoes)
+        run: npx supabase start -x studio,imgproxy,edge-runtime,logflare,vector,realtime,storage-api,supavisor,postgres-meta
+      - name: Gerar .env.development.local
+        run: npx supabase status -o env | node scripts/write-local-env.mjs
+      - run: npm run test:integration
+      - name: Parar Supabase local
+        if: always()
+        run: npx supabase stop --no-backup
