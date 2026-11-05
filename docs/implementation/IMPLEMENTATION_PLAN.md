@@ -7,7 +7,7 @@ Estado atual de cada fase em `STATUS.md`. Referências `Dnn` apontam para `docs/
 | 0 | Alinhamento | Concluída (pendências listadas em `DECISIONS.md`) | — |
 | 1 | Fundação | Concluída | — |
 | 2 | Identidade e convites | Concluída | — |
-| 2b | Contas e qualidade | Próxima | D28, D29 (D30 só para exclusão) |
+| 2b | Contas e qualidade | Implementada (falta aplicar a migração em produção) | D28, D29, D36, D37 |
 | 3 | Conteúdo e trilhas | Planejada | D23–D27; D32/D33 durante a fase |
 | 4 | Progresso e autodeclaração | Planejada | D10, D15, D24 |
 | 5 | Submissões e revisão | Planejada | D3, D4, D19, D25 |
@@ -21,16 +21,17 @@ Projeto, lint, typecheck, testes, estrutura de features, ambientes, conexão com
 ## Fase 2 — Identidade e convites (concluída)
 Login/logout, criação, consumo, expiração e revogação de convites, perfis e papéis, autorização no servidor e RLS, confirmação de e-mail.
 
-## Fase 2b — Contas e qualidade
+## Fase 2b — Contas e qualidade (implementada)
 Implementar:
 - etapa obrigatória de nome de exibição após ativação e edição posterior (D28);
 - recuperação de senha (D8);
 - alteração de papel, desativação e reativação pela gerência, com registro de eventos (D9, D21, D29);
 - suíte de integração de RLS/RPC executável por comando documentado, migrando os scripts E2E atuais;
-- revisão da senha mínima.
+- senha mínima de 8 caracteres (D36);
+- CI no GitHub Actions (D37).
 
 Aceitação:
-- AC-41 a AC-46 passam;
+- AC-41 a AC-46 e AC-53 passam;
 - usuário não altera o próprio papel; último gerente protegido;
 - conta desativada perde acesso imediatamente.
 
@@ -75,10 +76,10 @@ Implementar:
 - correções de competência e de XP;
 - regras de níveis;
 - perfil individual;
-- ranking geral.
+- ranking geral, com ocultação de perfis pela gerência (D35).
 
 Aceitação:
-- AC-23 a AC-27, AC-31 a AC-33, AC-50.
+- AC-23 a AC-27, AC-31 a AC-33, AC-50, AC-52.
 
 ## Fase 7 — Painel gerencial
 Implementar:
@@ -98,7 +99,7 @@ Implementar/verificar:
 - testes de autorização para todos os papéis;
 - acessibilidade e responsividade;
 - erros e logs;
-- exclusão de conta (após D30) e termos/aviso de privacidade (D34);
+- exclusão de conta (D30) e termos/aviso de privacidade (D34);
 - seed de demonstração sem dados pessoais;
 - procedimento de backup e rollback.
 

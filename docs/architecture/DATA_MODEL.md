@@ -44,25 +44,41 @@ Referências `Dnn` apontam para `docs/product/DECISIONS.md`. A seção "Implemen
 | `revoke_invitation(id)` | Gerência; só convites não usados |
 | `get_invitation_info(token_hash)` | `anon`/`authenticated`; e-mail, papel e estado do convite |
 | `list_users_for_admin()` | Gerência; perfis + e-mail de `auth.users` |
+| `set_display_name(name)` | Próprio usuário ativo (`auth.uid()`); 2–60 caracteres, sem espaços nas pontas (D28) |
+| `get_my_account_status()` | Próprio usuário, inclusive inativo/desativado: `activated`, `disabled` |
+| `change_user_role(user_id, role)` | Gerência; não altera o próprio papel nem conta não ativada; protege o último gerente (D29); registra evento |
+| `set_user_disabled(user_id, disabled)` | Gerência; não altera a própria conta; protege o último gerente; registra evento (D9) |
+| `lock_managers_and_authorize()`, `other_active_managers(id)` | Internas: bloqueiam as linhas de gerentes e revalidam o chamador, para que operações concorrentes não deixem o sistema sem gerente |
 | `handle_new_user`, `set_updated_at` | Triggers |
+
+### `account_events`
+| Coluna | Tipo | Notas |
+|---|---|---|
+| `id` | uuid PK | |
+| `user_id` | uuid → profiles | `on delete cascade` |
+| `event_type` | text | CHECK: `role_changed`, `disabled`, `reactivated` |
+| `old_value`, `new_value` | text null | Papéis anterior e novo em `role_changed` |
+| `actor_id` | uuid → profiles | `on delete set null` |
+| `created_at` | timestamptz | |
+
+Escrita apenas pelas funções `change_user_role` e `set_user_disabled`; sem UPDATE/DELETE.
 
 ### RLS
 - `profiles`: SELECT do próprio perfil (se ativo) ou de todos pela gerência. Sem INSERT/UPDATE/DELETE pelo cliente.
 - `invitations`: SELECT e INSERT apenas pela gerência ativa; INSERT exige `created_by = auth.uid()`.
+- `account_events`: SELECT apenas pela gerência ativa; sem escrita pelo cliente.
 - `anon` não tem acesso a tabelas.
 
 ## Planejado
 
-### Contas (Fase 2b)
-- **Nome de exibição** (D28): RPC para o próprio usuário definir `display_name` (validação de tamanho; sem alterar outros campos).
-- **Gestão de papéis e status** (D9, D21, D29): RPCs da gerência para alterar `role`, `disabled_at`; regras de "não alterar o próprio papel" e "manter ao menos um gerente ativo" verificadas na mesma transação.
-- **`account_events`** (suposição): histórico imutável de mudanças de papel e status (`user_id`, `event_type`, `old_value`, `new_value`, `actor_id`, `created_at`).
+### Contas (pendências)
+- **Ocultar do ranking** (D35, Fase 6): coluna em `profiles` alterável só pela gerência, com evento em `account_events`.
 - **Leitura pública de nome**: fila de revisão e ranking precisam do nome de exibição de outras pessoas; expor por view/RPC que retorne apenas `id` e `display_name`, sem e-mail.
-- **Exclusão de conta**: política de FKs depende de D30. Toda nova FK para `profiles` deve ter o comportamento de exclusão decidido explicitamente.
+- **Exclusão de conta** (D30, Fase 8): apaga perfil, credenciais e dados próprios (progresso, submissões, XP, competências) via `on delete cascade`; revisões feitas pela pessoa são mantidas com `reviewer_id` nulo e a cópia `reviewer_name`. Toda nova FK para `profiles` deve declarar esse comportamento.
 
 ### Conteúdo (Fase 3)
 - **`learning_paths`**: `id`, `title`, `slug` unique, `description`, `status` (`draft`, `published`, `archived`), `sort_order`, `created_by`, `updated_by`, `created_at`, `updated_at`.
-- **`learning_path_prerequisites`** (D27): (`learning_path_id`, `required_path_id`) PK composta; CHECK contra autorreferência; ciclos rejeitados na escrita. Regra de conclusão de trilha: D32.
+- **`learning_path_prerequisites`** (D27): (`learning_path_id`, `required_path_id`) PK composta; CHECK contra autorreferência; ciclos rejeitados na escrita. Trilha concluída = todas as atividades publicadas feitas (D32).
 - **`modules`**: `id`, `learning_path_id`, `title`, `description`, `sort_order`.
 - **`activities`**: `id`, `module_id`, `title`, `description`, `instructions`, `activity_type` (`content`, `exercise`, `project`, `assessment`), `completion_criteria`, `approval_criteria` (obrigatório quando exige revisão), `xp_reward` int ≥ 0 (elegível quando > 0, D15), `status` (`draft`, `published`, `archived`), `sort_order`, `created_by`, `updated_by`, timestamps.
   - Modo de conclusão derivado do tipo (D24): `content` → autodeclarado; demais → revisão. Implementar como coluna gerada ou função, sem valor livre.
@@ -77,7 +93,7 @@ Referências `Dnn` apontam para `docs/product/DECISIONS.md`. A seção "Implemen
   - Unique (`user_id`, `activity_id`, `version`); no máximo uma submissão aberta (`pending`/`claimed`) por usuário e atividade (índice único parcial).
   - Reenvio cria nova linha com `version + 1` (D4). Após aprovação, não há novo envio (suposição).
   - CHECK `claimed_by <> user_id`.
-- **`reviews`**: `id`, `submission_id`, `reviewer_id`, `decision` (`approved`, `changes_requested`), `feedback`, `created_at`. Imutável (sem UPDATE/DELETE), uma linha por decisão.
+- **`reviews`**: `id`, `submission_id`, `reviewer_id` (`on delete set null`), `reviewer_name` (cópia do nome no momento da revisão, mantida se a conta for excluída, D30), `decision` (`approved`, `changes_requested`), `feedback`, `created_at`. Imutável (sem UPDATE/DELETE), uma linha por decisão.
 - **`submission_events`** (suposição): assumir, liberar e reatribuir (D19), com autor e data.
 
 ### Competências e gamificação (Fase 6)

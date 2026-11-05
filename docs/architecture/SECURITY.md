@@ -34,19 +34,20 @@ Proteger contra:
 |---|---|---|---|
 | Ler conteúdo publicado de trilhas desbloqueadas | ✓ | ✓ | ✓ |
 | Alterar o próprio progresso, criar/consultar as próprias submissões | ✓ | ✓ | ✓ |
-| Definir o próprio nome de exibição | ✓ | ✓ | ✓ |
+| Definir o próprio nome de exibição e trocar a própria senha | ✓ | ✓ | ✓ |
 | Ver ranking (nome, nível, XP) | ✓ | ✓ | ✓ |
 | Criar, editar, publicar e arquivar conteúdo (D23) | | ✓ | ✓ |
 | Assumir, liberar e revisar submissões de outras pessoas | | ✓ | ✓ |
 | Corrigir XP e competência de outras pessoas (D12, D16) | | ✓ | ✓ |
 | Liberar/reatribuir submissão assumida por outro revisor (D19) | | | ✓ |
 | Criar e revogar convites (D5) | | | ✓ |
-| Alterar papel, desativar e reativar contas (D9, D21) | | | ✓ |
+| Alterar papel, desativar e reativar contas de outras pessoas (D9, D21) | | | ✓ |
+| Ocultar perfis do ranking (D35) | | | ✓ |
 | Consultar dados individuais de outros membros e métricas agregadas | | | ✓ |
 
 Restrições que valem para todos os papéis:
 - Ninguém revisa a própria entrega nem corrige o próprio XP ou competência.
-- Ninguém altera o próprio papel; o último gerente ativo não pode ser rebaixado nem desativado (D29).
+- Ninguém altera o próprio papel nem desativa a própria conta; o último gerente ativo não pode ser rebaixado nem desativado (D29). Operações concorrentes são serializadas por bloqueio das linhas de gerentes.
 - Usuário inativo ou desativado não tem papel efetivo (`current_profile_role()` retorna nulo).
 - Nenhum papel, `user_id`, XP ou status enviado pelo cliente é confiado sem verificação no servidor.
 
@@ -65,13 +66,13 @@ Restrições que valem para todos os papéis:
 
 ## Checklist pré-produção
 - [x] RLS ativada nas tabelas atuais (`profiles`, `invitations`).
-- [ ] RLS testada por suíte automatizada (hoje: scripts E2E manuais).
+- [x] RLS e funções de contas e convites testadas por suíte automatizada (`npm run test:integration`, também no CI).
 - [x] Chaves privilegiadas fora do cliente.
 - [x] Fluxo de convite testado (scripts E2E).
-- [ ] Fluxo de recuperação de senha implementado e testado.
+- [ ] Fluxo de recuperação de senha implementado (falta teste manual com e-mail real em produção).
 - [ ] Acesso entre usuários testado negativamente para cada nova tabela.
 - [ ] XP idempotente sob requisições repetidas.
 - [ ] Revisão concorrente e autoavaliação testadas.
 - [ ] Política de exclusão de conta (D30) e aviso de privacidade (D34) definidos.
 - [ ] Backups/recuperação e procedimento de migração documentados.
-- [ ] Senha mínima revisada (hoje 6 caracteres no Supabase e na validação do cadastro).
+- [ ] Senha mínima de 8 caracteres (D36): aplicação e Supabase local ajustados; falta o painel do Supabase em nuvem.

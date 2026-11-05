@@ -8,7 +8,11 @@ Referências `Dnn` apontam para `DECISIONS.md`. A navegação apenas reflete as 
 |---|---|---|---|
 | Login | `/login` | público | Implementada |
 | Aceite de convite | `/invite/[token]` | público (link) | Implementada |
-| Confirmação de e-mail | `/auth/confirm` | público (link) | Implementada |
+| Confirmação de e-mail e recuperação | `/auth/confirm` | público (link) | Implementada |
+| Esqueci a senha | `/forgot-password` | público | Implementada |
+| Nova senha | `/reset-password` | sessão (link de recuperação ou logado) | Implementada |
+| Boas-vindas (nome obrigatório) | `/welcome` | member ativo sem nome | Implementada |
+| Meu perfil | `/profile` | member | Implementada |
 | Dashboard | `/dashboard` | member | Implementada (conteúdo provisório) |
 | Trilhas → módulos → atividades | `/paths` | member | Planejada (Fase 3) |
 | Competências | `/competencies` | member | Planejada (Fase 6) |
@@ -16,13 +20,13 @@ Referências `Dnn` apontam para `DECISIONS.md`. A navegação apenas reflete as 
 | Fila de revisão | `/reviews` | reviewer | Planejada (Fase 5) |
 | Gestão de conteúdo | a definir | reviewer | Planejada (Fase 3) |
 | Convites | `/admin/invitations` | manager | Implementada |
-| Usuários | `/admin/users` | manager | Somente leitura (ações pendentes) |
+| Usuários | `/admin/users` | manager | Implementada (papel, desativar, reativar) |
 | Painel gerencial | a definir | manager | Planejada (Fase 7) |
 
 ## Fluxo A: primeiro acesso
 1. Gerência cria convite para o e-mail e o papel do novo usuário e copia o link (D5, D7).
 2. Usuário abre o link; o sistema valida token, validade e estado do convite e mostra o e-mail convidado (somente leitura).
-3. Usuário define a senha e cria a conta.
+3. Usuário define a senha (mínimo de 8 caracteres, D36) e cria a conta.
 4. Supabase envia e-mail de confirmação; o usuário confirma pelo link (D22).
 5. O sistema consome o convite e ativa a conta com o papel do convite. Se a confirmação for aberta em outro dispositivo, o consumo ocorre no próximo login ou ao reabrir o link do convite.
 6. Usuário define o nome de exibição, se ainda não o fez (D28).
@@ -78,12 +82,18 @@ Casos de erro: token inválido, expirado, revogado ou usado; e-mail da conta dif
 4. O sistema impede alterar o próprio papel e rebaixar ou desativar o último gerente ativo (D29), e registra autor e data de cada mudança.
 
 ## Fluxo H: recuperação de senha
-1. Usuário solicita recuperação informando o e-mail.
+1. Usuário abre "Esqueci a senha" no login e informa o e-mail.
 2. O sistema responde com mensagem genérica, independentemente de o e-mail existir.
-3. Usuário segue o link recebido por e-mail e define nova senha (D8).
+3. Usuário abre o link recebido **no mesmo navegador** (fluxo PKCE); `/auth/confirm` cria a sessão e leva a `/reset-password`.
+4. Usuário define a nova senha e segue para o dashboard (D8).
+5. Link inválido, expirado ou aberto em outro navegador leva de volta a "Esqueci a senha" com a explicação.
 
-## Fluxo I: exclusão da própria conta
-Bloqueado até a decisão D30 (tratamento de submissões, revisões, evidências e XP).
+Usuários logados também trocam a senha por "Meu perfil" → "Alterar senha".
+
+## Fluxo I: exclusão da própria conta (Fase 8)
+1. Usuário solicita a exclusão em "Meu perfil" e confirma.
+2. São apagados perfil, credenciais, progresso, submissões próprias, XP e competências (D30).
+3. Revisões que a pessoa fez em entregas de outras pessoas permanecem, com o nome do autor.
 
 ## Regras de UX
 - Sempre mostrar o estado atual e a próxima ação disponível.

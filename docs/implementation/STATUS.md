@@ -4,7 +4,7 @@ Documento vivo: atualizar ao concluir cada etapa. Serve para retomar o trabalho 
 
 - **Atualizado em:** 2026-11-03.
 - **Último commit de código:** `83ebd2d` (2026-10-18).
-- **Fases concluídas:** 1 (fundação) e 2 (identidade e convites). Ver `IMPLEMENTATION_PLAN.md`.
+- **Fases concluídas:** 1 (fundação), 2 (identidade e convites) e 2b (contas e qualidade, implementada localmente; migração ainda não aplicada em produção). Ver `IMPLEMENTATION_PLAN.md`.
 
 ## Ambientes
 | Item | Estado |
@@ -13,7 +13,7 @@ Documento vivo: atualizar ao concluir cada etapa. Serve para retomar o trabalho 
 | Supabase | Projeto em nuvem `npcp-academy` (ref `vzkhvbygaodtrmhsputz`), região São Paulo |
 | E-mail de Auth | SMTP Resend configurado; confirmação de e-mail ativa; redirects na allowlist |
 | Primeiro gerente | Criado via `seed:manager` |
-| Migrações | 6 no repositório. O último registro confirmou 5/5 na nuvem, antes de `20261018090000_admin_list_users`; **confirmar** com `npx supabase migration list --linked` |
+| Migrações | 7 no repositório. Na nuvem: as 6 primeiras (a 6ª confirmada pelo funcionamento de `/admin/users` em produção); **`20261103120000_account_management` pendente** — sem ela, Boas-vindas, Meu perfil e as ações de Usuários falham em produção |
 
 ## O que está implementado
 
@@ -23,10 +23,14 @@ Documento vivo: atualizar ao concluir cada etapa. Serve para retomar o trabalho 
 | `/` | Redireciona para `/dashboard` |
 | `/login` | Login por e-mail/senha; consome convite pendente após login (fallback) |
 | `/invite/[token]` | Mostra estado do convite; cadastro; se autenticado, consome o convite |
-| `/auth/confirm` | Confirmação de e-mail (PKCE `code` ou `token_hash`) e redireciona ao convite |
+| `/auth/confirm` | Confirmação de e-mail e de recuperação de senha (PKCE `code` ou `token_hash`); `next` só aceita destinos da lista em `src/lib/auth/redirect.ts` |
+| `/forgot-password` | Pedido de link de recuperação (resposta genérica) |
+| `/reset-password` | Nova senha (sessão do link de recuperação ou usuário logado) |
+| `/welcome` | Nome de exibição obrigatório no primeiro acesso |
+| `/profile` | Meu perfil: editar nome, ver e-mail e papel, alterar senha |
 | `/dashboard` | Boas-vindas e papel (conteúdo provisório) |
 | `/admin/invitations` | Gerência cria (link copiável) e revoga convites |
-| `/admin/users` | Gerência lista usuários e status (somente leitura) |
+| `/admin/users` | Gerência lista usuários, altera papel, desativa e reativa contas (com confirmação) |
 
 Menu por papel em `src/lib/navigation.ts`; Trilhas, Competências e Revisões aparecem como "em breve".
 
@@ -41,27 +45,34 @@ Ver seção "Implementado" de `docs/architecture/DATA_MODEL.md`.
 | `20261017190300_get_invitation_info` | RPC pública de estado do convite |
 | `20261017200000_fix_invitations_used_consistency` | CHECK de uso compatível com exclusão de usuário |
 | `20261018090000_admin_list_users` | RPC `list_users_for_admin` |
+| `20261103120000_account_management` | `account_events`, `set_display_name`, `get_my_account_status`, `change_user_role`, `set_user_disabled` |
 
 ### UI
 Design system (tokens, fontes, componentes base, app shell responsivo, ícones Lucide, estados de página, diálogo de confirmação). Ver `docs/design/DESIGN_SYSTEM.md`.
 
-Revisão de UI/UX em 2026-11-03: foco visível em superfícies escuras, bordas de campo e texto secundário com contraste AA, `<nav>` e link "pular para o conteúdo", sidebar fixa, títulos por página, mensagem de erro de confirmação no login, `loading`/`error`/`not-found`, confirmação ao revogar convite, botão de copiar link, mostrar/ocultar senha e datas nas listas administrativas. Fora do escopo desta revisão (dependem da Fase 2b): nome de exibição obrigatório (D28), "Esqueci a senha" (D8) e ações em `/admin/users`.
+Revisão de UI/UX em 2026-11-03: foco visível em superfícies escuras, bordas de campo e texto secundário com contraste AA, `<nav>` e link "pular para o conteúdo", sidebar fixa, títulos por página, mensagem de erro de confirmação no login, `loading`/`error`/`not-found`, confirmação ao revogar convite, botão de copiar link, mostrar/ocultar senha e datas nas listas administrativas.
 
 ## Testes
 | Tipo | Conteúdo | Como rodar |
 |---|---|---|
-| Unitários/componente (Vitest) | 43 testes: smoke node/jsdom, hierarquia de papéis, token de convite, navegação por papel, contraste dos tokens, formatação de data, `ConfirmDialog`, `PasswordInput`, `CopyButton` | `npm test` |
-| E2E manual — RLS e convite | 6 verificações: RLS de convite, consumo válido, reuso rejeitado, member bloqueado, e-mail divergente | `node --env-file-if-exists=.env.development.local scripts/e2e-smoke.mjs` (Supabase local) |
-| E2E manual — e-mail | 9 verificações: cadastro exige confirmação, e-mail no Mailpit, confirmação, consumo, ativação | `scripts/e2e-invite-email.mjs` (Supabase local) |
+| Unitários/componente (Vitest) | 59 testes: papéis, token, navegação, contraste dos tokens, datas, componentes interativos, validação de nome e senha, mensagens de erro, redirecionamento seguro | `npm test` |
+| Integração (Vitest + Supabase local) | 24 testes: alteração de papel (permitido/negado, próprio papel, conta não ativada, **concorrência entre dois gerentes**), desativação com sessão válida, reativação, histórico de eventos, nome de exibição, perfil alheio, RLS e consumo de convites (válido, reuso, e-mail divergente, expirado, em nome de outro) | `npm run test:integration` |
+| Manual — e-mail | 9 verificações do convite com Mailpit | `node --env-file-if-exists=.env.development.local scripts/e2e-invite-email.mjs` |
+| CI | Os dois primeiros, mais lint, typecheck e build, a cada push/PR | `.github/workflows/ci.yml` |
 
-Última execução registrada: lint, typecheck, `npm test` (43/43) e `npm run build` OK em 2026-11-03; verificação em execução (`/login`, `/login?error=confirm`, 404, redirecionamento sem sessão) OK. Scripts E2E: 2026-10-18. Telas autenticadas não foram inspecionadas em navegador nesta revisão.
+Última execução (2026-11-03, local): lint OK; typecheck OK; `npm test` 59/59; `npm run test:integration` 24/24 em 4 execuções seguidas; `e2e-invite-email` 9/9; `npm run build` OK; rotas públicas e redirecionamentos conferidos com o app rodando contra o Supabase local. **Não executados:** o workflow de CI no GitHub (roda no próximo push), o fluxo autenticado no navegador (Boas-vindas, Meu perfil, ações de Usuários) e a recuperação de senha com e-mail real.
 
 ### Cobertura de critérios de aceitação
 | AC | Estado |
 |---|---|
-| AC-01, AC-02 | Coberto por scripts E2E manuais |
-| AC-03 | Implementado (app shell redireciona sem perfil ativo); sem teste automatizado |
-| AC-04 | Implementado para convites e usuários (servidor + RLS); teste negativo de RLS só no script E2E |
+| AC-01, AC-02 | Integração (RLS + consumo) e script de e-mail |
+| AC-03 | Implementado; redirecionamentos conferidos manualmente |
+| AC-04 | Implementado; testes negativos de integração para convites, papéis e status |
+| AC-41 | Implementado (`/welcome`); validação coberta por integração |
+| AC-42, AC-43, AC-45 | Cobertos por integração |
+| AC-44 | Coberto por integração (RLS com sessão válida); login informa conta desativada |
+| AC-46 | Implementado; falta teste com e-mail real |
+| AC-53 | Implementado na aplicação e no Supabase local; falta o painel da nuvem |
 | AC-05 | Implementado (`server-only`, sem `NEXT_PUBLIC_` em segredos); sem verificação automatizada do bundle |
 | AC-37 | Parcial (app shell responsivo; sem teste em navegador) |
 | AC-38 | Parcial (estados vazio, carregando, erro e 404 existem; sem cobertura automatizada de página) |
@@ -69,17 +80,17 @@ Revisão de UI/UX em 2026-11-03: foco visível em superfícies escuras, bordas d
 | Demais | Não implementados |
 
 ## Lacunas conhecidas
-1. Nome de exibição é opcional no cadastro e não há etapa obrigatória após ativação (D28).
-2. Sem UI de recuperação de senha (D8), embora o SMTP já esteja configurado.
-3. `/admin/users` é somente leitura: falta alterar papel, desativar e reativar (D9, D21, D29).
-4. Testes de RLS e concorrência existem só como scripts manuais contra o Supabase local; não há suíte de integração no `npm test` nem CI.
-5. Senha mínima de 6 caracteres (`supabase/config.toml` e validação do cadastro) — revisar.
-6. `seed.sql` vazio; seed fictício da trilha piloto pendente (Fase 3).
-7. RLS de `profiles` só permite ler o próprio perfil (ou tudo, para gerência); fila e ranking exigirão leitura restrita de nomes (ver `DATA_MODEL.md`).
+1. Migração `20261103120000_account_management` não aplicada na nuvem (exige autorização).
+2. Senha mínima de 8 no painel do Supabase em nuvem não ajustada.
+3. Recuperação de senha depende do link ser aberto no mesmo navegador (PKCE); confirmar com e-mail real em produção.
+4. Não há visualização do histórico `account_events` na interface (só no banco).
+5. `seed.sql` vazio; seed fictício da trilha piloto pendente (Fase 3).
+6. RLS de `profiles` só permite ler o próprio perfil (ou tudo, para gerência); fila e ranking exigirão leitura restrita de nomes (ver `DATA_MODEL.md`).
 
 ## Riscos
 - **Desenvolvimento contra produção:** sem Supabase local rodando, `npm run dev` usa `.env.local`, que aponta para o projeto em nuvem de produção. Testes manuais e scripts podem criar dados reais. Mitigação: usar o Supabase local para desenvolvimento ou criar um projeto separado de dev.
 - `SUPABASE_SERVICE_ROLE_KEY` não é usada pela aplicação em execução; se estiver configurada no Vercel, pode ser removida.
+- Se a aplicação for publicada antes da migração, Boas-vindas falha para quem não tem nome e bloqueia o acesso dessas contas.
 - Planos gratuitos: Supabase pode pausar por inatividade; limites de e-mail do Resend.
 
 ## Armadilhas operacionais
@@ -89,7 +100,9 @@ Revisão de UI/UX em 2026-11-03: foco visível em superfícies escuras, bordas d
 - Nunca `db reset --linked`; `db push` só após `supabase link` com alvo confirmado.
 - `cacheComponents`/PPR estão desativados (área autenticada dinâmica).
 - Não usar o tipo gerado `LayoutProps<"/">` no layout raiz (quebra `typecheck` em clone limpo).
-- Após mudar o esquema, regenerar `src/types/database.ts` (`npx supabase gen types typescript --local`).
+- Após mudar o esquema, regenerar `src/types/database.ts` (`npx supabase gen types typescript --local`). A versão local do gerador sai sem formatação e sem o bloco `__InternalSupabase`: formatar com `npx prettier@3.3.3 --no-semi --write src/types/database.ts` e manter o bloco.
+- `next start` carrega `.env.local` (produção), não `.env.development.local`. Para testar localmente, use `npm run dev`.
+- `next dev` insere um bloco de instruções do Next.js no fim do `AGENTS.md`.
 
 ## Histórico
 | Data | Marco |
@@ -98,3 +111,5 @@ Revisão de UI/UX em 2026-11-03: foco visível em superfícies escuras, bordas d
 | 2026-10-17 | Migrações base, auth e convites |
 | 2026-10-18 | Confirmação PKCE, fallback local/nuvem, design system, lista de usuários, fallback de consumo no login |
 | 2026-11-03 | Deploy no Vercel com domínio e Resend; revisão da documentação e registro de decisões D17–D34 |
+| 2026-11-03 | Revisão de UI/UX (acessibilidade, estados de página, confirmação de ações) |
+| 2026-11-03 | Fase 2b local: nome obrigatório, Meu perfil, recuperação de senha, gestão de papéis/status, senha mínima 8, suíte de integração e CI; decisões D35–D37 |

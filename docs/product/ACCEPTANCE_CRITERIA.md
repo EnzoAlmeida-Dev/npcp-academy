@@ -14,6 +14,7 @@ Cada critério deve ser validado por teste automatizado, teste manual documentad
 - AC-44: Conta desativada não acessa páginas nem dados, mesmo com sessão ainda válida; reativada, volta a acessar com os dados preservados (D9).
 - AC-45: Mudanças de papel e de status de conta registram autor e data.
 - AC-46: O usuário recupera a senha por e-mail sem que a resposta revele se o e-mail tem conta (D8).
+- AC-53: Senhas novas ou redefinidas exigem ao menos 8 caracteres; contas existentes continuam entrando com a senha atual (D36).
 
 ## Trilhas e conteúdo
 - AC-06: Um membro vê apenas trilhas publicadas.
@@ -58,6 +59,7 @@ Cada critério deve ser validado por teste automatizado, teste manual documentad
 - AC-33: Ranking é ordenado por XP, empates compartilham a posição e só exibe nome de exibição, nível e XP (D20).
 - AC-34: Recompensa de aprovação ocorre somente após a aprovação persistida com sucesso.
 - AC-51: Atividade não elegível (`xp_reward = 0`) não gera transação de XP (D15).
+- AC-52: A gerência oculta um perfil do ranking; o perfil some do ranking para todos, a ação fica registrada e apenas a gerência pode desfazê-la (D35).
 
 ## Painel e implantação
 - AC-35: Gerência autorizada consegue consultar progresso agregado por trilha.

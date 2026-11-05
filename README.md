@@ -45,9 +45,9 @@ Diagnóstico sem expor valores: `npm run check:supabase`.
 ```powershell
 npm install
 npx supabase start
-# criar .env.development.local com os valores de `npx supabase status`:
-#   NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
-#   SUPABASE_SERVICE_ROLE_KEY, INVITE_TTL_DAYS=7, APP_URL=http://127.0.0.1:3000
+# gera .env.development.local a partir do Supabase local (nao imprime chaves;
+# recusa URL que nao seja local):
+npx supabase status -o env | node scripts/write-local-env.mjs
 npx supabase migration up
 npm run dev        # http://127.0.0.1:3000 (use 127.0.0.1, não localhost)
 ```
@@ -68,10 +68,14 @@ O script é idempotente, exige `--confirm`, cria a conta de auth se não existir
 | `npm run dev:next` | Dev sem o launcher |
 | `npm run check:supabase` | Conectividade dos ambientes |
 | `npm run lint` / `npm run typecheck` | Qualidade |
-| `npm test` / `npm run test:watch` | Testes Vitest |
+| `npm test` / `npm run test:watch` | Testes unitários e de componente (Vitest) |
+| `npm run test:integration` | Testes de RLS e funções SQL contra o Supabase **local** (exige `npx supabase start`) |
 | `npm run build` / `npm run start` | Produção (não rodar `build` com `dev` ativo) |
 
-Verificações E2E manuais (Supabase local): `scripts/e2e-smoke.mjs` e `scripts/e2e-invite-email.mjs`.
+Verificação manual do fluxo de convite com e-mail (Supabase local + Mailpit): `node --env-file-if-exists=.env.development.local scripts/e2e-invite-email.mjs`.
+
+### Integração contínua
+`.github/workflows/ci.yml` roda a cada push e PR: lint, typecheck, testes, build e, em outro job, `test:integration` contra um Supabase local criado no runner. Nunca usa o projeto de produção. Para exigir CI verde antes do merge, ative a proteção da branch `main` no GitHub (Settings → Branches).
 
 ### Migrações e seeds
 - Migrações versionadas em `supabase/migrations/`. Mudança de esquema sempre por nova migração.
@@ -94,6 +98,7 @@ A aplicação está publicada no Vercel com domínio próprio. Para um novo ambi
    - confirmação de e-mail habilitada;
    - `APP_URL` e `APP_URL/auth/confirm` na allowlist de redirects;
    - SMTP próprio configurado (Resend);
+   - senha mínima de 8 caracteres (Authentication → Providers → Email → Minimum password length), igual ao `config.toml` local;
    - migrações aplicadas no projeto correto;
    - primeiro gerente criado via `seed:manager`.
 
