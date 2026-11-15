@@ -1,8 +1,7 @@
 # Design System — NPCP Academy
 
 > **Status:** direção visual consolidada e aplicada em todas as telas atuais
-> (revisão de 2026-11-05). A marca segue sem logo oficial; a validação final da
-> marca institucional deve ser registrada antes do lançamento público.
+> (revisão de 2026-11-05). Logo oficial aplicada em 2026-11-15.
 
 Este documento é a fonte única para as decisões de design visual e UX/UI da
 plataforma.
@@ -43,7 +42,8 @@ bloqueado, com o motivo.
 - Ícones: **Lucide**, importando apenas os usados. Decorativos (`aria-hidden`) e sempre
   acompanhados de texto ou `sr-only`.
 - Estados de rota: `loading.tsx`, `error.tsx`, `not-found.tsx`. Títulos via `metadata`.
-- Marca como texto “NPCP Academy” (Poppins Semi-Bold); **ainda sem logo**.
+- Logo aplicada pelo componente `Wordmark` (`src/components/brand/wordmark.tsx`); ver
+  "Marca" abaixo.
 - Contrastes e a escala de papéis verificados por `src/lib/contrast.test.ts`, que lê
   `globals.css`: alterar uma cor que viole o mínimo quebra o teste.
 
@@ -184,6 +184,34 @@ Ações irreversíveis (revogar, desativar) exigem `ConfirmDialog`: foco inicial
 elemento de origem. Segredos exibidos uma única vez (link de convite) avisam isso e
 oferecem botão de copiar.
 
+## Marca
+
+Logo "Build": o símbolo (barra branca cortada por um traço vermelho) ocupa o lugar do
+"A" de Academy. Cores: grafite `#1C1D21`, vermelho `#B81825` e branco — os mesmos tokens
+da plataforma.
+
+| Versão | Arquivo no projeto | Onde é usada |
+|---|---|---|
+| Wordmark, texto grafite | `public/brand/wordmark-dark.svg` | Sidebar (148px) e barra superior no celular (132px) |
+| Wordmark, texto branco | `public/brand/wordmark-white.svg` | Painel grafite do login (168px) e faixa do celular (140px) |
+| Favicon multi-tamanho | `src/app/favicon.ico` | Abas de navegador antigos (16–64px) |
+| Símbolo em tile | `src/app/icon.svg` | Aba do navegador (vetorial) |
+| Ícone Apple | `src/app/apple-icon.png` | Atalho na tela inicial do iPhone (180px) |
+| Ícones Android | `public/icons/` e `src/app/manifest.ts` | Atalho na tela inicial do Android; a versão quadrada é a recortável (`maskable`) |
+
+Regras:
+
+- `Wordmark tone="dark"` sobre fundos claros; `tone="light"` sobre o grafite.
+- Largura mínima da wordmark: 120px. Abaixo disso, usar só o símbolo.
+- Não recolorir o traço vermelho nem aplicar a wordmark sobre fotos.
+- O `alt` da logo é "NPCP Academy"; o nome continua nos títulos das páginas.
+- Os arquivos originais, com todas as versões, ficam em `docs/design/brand/` (o README de lá descreve cada uma).
+- O pacote original traz ainda o símbolo sem fundo (grafite e branco), para uso sobre
+  fotos ou cores. Nenhuma tela usa isso hoje; ficam para materiais externos ou um modo
+  escuro futuro.
+- O `favicon.ico` foi regravado com as mesmas imagens do pacote em RGBA (pixels idênticos),
+  porque o Next não lê ícones com PNG sem canal alfa.
+
 ## Grafismos e identidade visual
 
 - **Chevrons** são o grafismo oficial do MVP: indicam etapas e progresso, e compõem o
@@ -217,9 +245,8 @@ oferecem botão de copiar.
 
 ## Questões de design ainda abertas
 
-1. Confirmar a marca exibida (NPCP Academy, CIMATECjr ou composição institucional) e obter
-   seus ativos oficiais. **Ainda não há logo.**
-2. Validar a necessidade de modo escuro após o MVP.
+1. Validar a necessidade de modo escuro após o MVP (o pacote da logo já tem versões para
+   fundo escuro).
 
 Toda decisão nova deve ser incorporada neste arquivo, evitando documentos
 paralelos para a mesma finalidade.

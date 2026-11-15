@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
 
+import { Wordmark } from "@/components/brand/wordmark";
+
 import { ROLE_LABELS } from "@/lib/auth/roles";
 import { getCurrentProfile } from "@/lib/auth/session";
 import { getNavItemsForRole } from "@/lib/navigation";
@@ -9,14 +11,6 @@ import { createClient } from "@/lib/supabase/server";
 import { MobileNav } from "./mobile-nav";
 import { NavList } from "./nav-list";
 import { UserMenu } from "./user-menu";
-
-function Wordmark() {
-  return (
-    <span className="font-heading text-[15px] font-semibold tracking-tight text-ink">
-      NPCP Academy
-    </span>
-  );
-}
 
 export default async function AppShell({
   children,
@@ -50,8 +44,8 @@ export default async function AppShell({
       </a>
 
       <aside className="hidden w-60 shrink-0 flex-col lg:sticky lg:top-0 lg:flex lg:h-screen">
-        <div className="px-5 pb-5 pt-6">
-          <Wordmark />
+        <div className="px-5 pb-6 pt-6">
+          <Wordmark tone="dark" width={148} priority />
         </div>
         <div className="flex-1 overflow-y-auto px-2.5">
           <NavList items={items} />
@@ -63,7 +57,7 @@ export default async function AppShell({
 
       <div className="flex min-w-0 flex-1 flex-col lg:py-2 lg:pr-2">
         <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-canvas px-4 lg:hidden">
-          <Wordmark />
+          <Wordmark tone="dark" width={132} priority />
           <MobileNav items={items} name={name} role={roleLabel} />
         </header>
         <main

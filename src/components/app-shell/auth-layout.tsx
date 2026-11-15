@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 
+import { Wordmark } from "@/components/brand/wordmark";
+
 /** x inicial de cada chevron da arte; cor pela etapa que ele representa. */
 const CHEVRONS = [
   { x: -60, fill: "#f4f4f5" },
@@ -38,17 +40,12 @@ export function AuthLayout({
 }) {
   return (
     <div className="grid min-h-screen flex-1 grid-rows-[auto_1fr] bg-surface lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:grid-rows-none">
-      <div className="flex items-center justify-between overflow-hidden bg-ink px-6 py-5 lg:hidden">
-        <span className="font-heading text-[15px] font-semibold tracking-tight text-white">
-          NPCP Academy
-        </span>
-        <ChevronArt className="-mr-16 h-9 w-auto" />
+      <div className="flex items-center overflow-hidden bg-ink px-6 py-5 lg:hidden">
+        <Wordmark tone="light" width={140} priority />
       </div>
 
       <aside className="hidden flex-col justify-between overflow-hidden bg-ink p-10 lg:flex">
-        <span className="font-heading text-[15px] font-semibold tracking-tight text-white">
-          NPCP Academy
-        </span>
+        <Wordmark tone="light" width={168} priority />
         <ChevronArt className="w-[115%] max-w-none" />
         <div>
           <p className="max-w-md font-heading text-4xl font-semibold leading-tight tracking-tight text-white">

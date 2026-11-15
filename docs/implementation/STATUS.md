@@ -54,7 +54,7 @@ Revisão de UI/UX em 2026-11-03: foco visível em superfícies escuras, bordas d
 ## Testes
 | Tipo | Conteúdo | Como rodar |
 |---|---|---|
-| Unitários/componente (Vitest) | 77 testes: papéis, token, navegação, contraste dos tokens, datas, componentes interativos, progresso em chevrons, resumo do dashboard, validação de nome e senha, mensagens de erro, redirecionamento seguro | `npm test` |
+| Unitários/componente (Vitest) | 83 testes: identidade visual (manifest e arquivos da marca), papéis, token, navegação, contraste dos tokens, datas, componentes interativos, progresso em chevrons, resumo do dashboard, validação de nome e senha, mensagens de erro, redirecionamento seguro | `npm test` |
 | Integração (Vitest + Supabase local) | 24 testes: alteração de papel (permitido/negado, próprio papel, conta não ativada, **concorrência entre dois gerentes**), desativação com sessão válida, reativação, histórico de eventos, nome de exibição, perfil alheio, RLS e consumo de convites (válido, reuso, e-mail divergente, expirado, em nome de outro) | `npm run test:integration` |
 | Manual — e-mail | 9 verificações do convite com Mailpit | `node --env-file-if-exists=.env.development.local scripts/e2e-invite-email.mjs` |
 | CI | Os dois primeiros, mais lint, typecheck e build, a cada push/PR | `.github/workflows/ci.yml` |
@@ -99,6 +99,7 @@ Revisão de UI/UX em 2026-11-03: foco visível em superfícies escuras, bordas d
 - `cacheComponents`/PPR estão desativados (área autenticada dinâmica).
 - Não usar o tipo gerado `LayoutProps<"/">` no layout raiz (quebra `typecheck` em clone limpo).
 - Após mudar o esquema, regenerar `src/types/database.ts` (`npx supabase gen types typescript --local`). A versão local do gerador sai sem formatação e sem o bloco `__InternalSupabase`: formatar com `npx prettier@3.3.3 --no-semi --write src/types/database.ts` e manter o bloco.
+- Rode os testes a partir de `C:\dev\npcp-academy` (drive em maiúscula). Com o terminal em `c:\...`, o Vitest carrega o `setup.ts` duas vezes e todos os arquivos falham com "failed to find the current suite".
 - `next start` carrega `.env.local` (produção), não `.env.development.local`. Para testar localmente, use `npm run dev`.
 - `next dev` insere um bloco de instruções do Next.js no fim do `AGENTS.md`.
 
@@ -112,3 +113,4 @@ Revisão de UI/UX em 2026-11-03: foco visível em superfícies escuras, bordas d
 | 2026-11-03 | Revisão de UI/UX (acessibilidade, estados de página, confirmação de ações) |
 | 2026-11-05 | Fase 2b em produção: nome obrigatório, Meu perfil, recuperação de senha, gestão de papéis/status, senha mínima 8, suíte de integração e CI; decisões D35–D37 |
 | 2026-11-05 | Redesign Modern Learning SaaS em todas as telas |
+| 2026-11-15 | Logo oficial, favicon, ícones Apple/Android e manifest |
