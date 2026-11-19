@@ -114,3 +114,5 @@ Revisão de UI/UX em 2026-11-03: foco visível em superfícies escuras, bordas d
 | 2026-11-05 | Fase 2b em produção: nome obrigatório, Meu perfil, recuperação de senha, gestão de papéis/status, senha mínima 8, suíte de integração e CI; decisões D35–D37 |
 | 2026-11-05 | Redesign Modern Learning SaaS em todas as telas |
 | 2026-11-15 | Logo oficial, favicon, ícones Apple/Android e manifest |
+| 2026-11-18 | Especificação de trilhas, blocos, vínculo trainee/efetivado, XP e títulos (`LEARNING_PATHS.md`, D38–D45) |
+| 2026-11-19 | Decididos: blocos livres, prazos no CRUD, XP ×10, níveis por fórmula (limites pela metade, 125 × n × (n − 1)); termos e privacidade em fase de testes (`TERMS_AND_PRIVACY.md`); finalidade dos dados (D47) e métricas de acompanhamento dos membros (D48, RB-09); eventos de trilha (D49); prazos no evento (D50) |

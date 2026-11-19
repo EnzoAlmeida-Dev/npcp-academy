@@ -14,7 +14,8 @@ Referências `Dnn` apontam para `DECISIONS.md`. A navegação apenas reflete as 
 | Boas-vindas (nome obrigatório) | `/welcome` | member ativo sem nome | Implementada |
 | Meu perfil | `/profile` | member | Implementada |
 | Dashboard | `/dashboard` | member | Implementada (primeiros passos; visão geral para a gerência) |
-| Trilhas → módulos → atividades | `/paths` | member | Planejada (Fase 3) |
+| Trilhas → blocos → itens | `/paths` | member | Planejada (Fase 3) |
+| CRUD de trilhas | a definir | reviewer | Planejada (Fase 3) |
 | Competências | `/competencies` | member | Planejada (Fase 6) |
 | Perfil, XP e ranking | a definir | member | Planejada (Fase 6) |
 | Fila de revisão | `/reviews` | reviewer | Planejada (Fase 5) |
@@ -24,34 +25,36 @@ Referências `Dnn` apontam para `DECISIONS.md`. A navegação apenas reflete as 
 | Painel gerencial | a definir | manager | Planejada (Fase 7) |
 
 ## Fluxo A: primeiro acesso
-1. Gerência cria convite para o e-mail e o papel do novo usuário e copia o link (D5, D7).
+1. Gerência cria convite para o e-mail, o papel e o vínculo (trainee ou efetivado) do novo usuário e copia o link (D5, D7, D44).
 2. Usuário abre o link; o sistema valida token, validade e estado do convite e mostra o e-mail convidado (somente leitura).
 3. Usuário define a senha (mínimo de 8 caracteres, D36) e cria a conta.
 4. Supabase envia e-mail de confirmação; o usuário confirma pelo link (D22).
 5. O sistema consome o convite e ativa a conta com o papel do convite. Se a confirmação for aberta em outro dispositivo, o consumo ocorre no próximo login ou ao reabrir o link do convite.
 6. Usuário define o nome de exibição, se ainda não o fez (D28).
-7. Usuário aceita os termos de uso aplicáveis (D34, aberta).
+7. Usuário lê e aceita os termos de uso e o aviso de privacidade vigentes; o aceite registra versão e data (D34). Sem aceite, não segue.
 8. Usuário acessa o catálogo de trilhas.
 
 Casos de erro: token inválido, expirado, revogado ou usado; e-mail da conta diferente do convite; conta já existente; falha de rede. Mensagens públicas não revelam se um e-mail tem conta.
 
-## Fluxo B: atividade de conteúdo (autodeclarada)
-1. Membro abre uma trilha desbloqueada e uma atividade de conteúdo.
-2. Consulta instruções, links e critério de conclusão.
-3. Inicia a atividade; o sistema registra progresso e marca competências associadas como "em desenvolvimento" (D10).
-4. Membro marca como concluída.
-5. Se a atividade for elegível, o backend concede XP uma única vez (D15).
-6. Progresso e nível são atualizados.
+## Fluxo B: vídeo (autodeclarado)
+1. Membro abre uma trilha disponível e um bloco. Todos os blocos da trilha estão liberados (D33); itens ou blocos em atraso aparecem sinalizados (D31).
+2. Abre o vídeo (link externo, prioritariamente YouTube).
+3. Marca o vídeo como concluído; competências associadas vão para "em desenvolvimento" (D10).
+4. O backend concede o XP de vídeo uma única vez (D41).
 
-## Fluxo C: entrega com revisão
-1. Membro abre uma atividade de exercício, projeto ou avaliação (D24).
-2. Inicia a atividade (competências associadas vão para "em desenvolvimento") e prepara a evidência: URL e/ou texto (D25).
-3. Envia a submissão; ela entra na fila compartilhada.
-4. Revisor elegível assume a submissão.
-5. Revisor analisa os critérios e aprova ou solicita ajustes, com feedback.
-6. Sistema registra decisão, revisor, horário e feedback.
-7. Se aprovada: atividade concluída, competências associadas "demonstradas" (D11) e XP concedido se elegível.
-8. Se ajustes forem solicitados: membro consulta o feedback e envia nova versão (D4).
+## Fluxo C: entregas com revisão
+Vale para questão aberta (texto), entrega por link (URL), entrega final do bloco e entrega
+geral da trilha (D40).
+1. Membro abre o item e prepara a resposta ou o link.
+2. Envia a submissão; ela entra na fila compartilhada.
+3. Revisor elegível assume, analisa os critérios e aprova ou solicita ajustes, com feedback.
+4. Se aprovada: item concluído, competências associadas "demonstradas" (D11) e XP do tipo
+   concedido (D41).
+5. Se ajustes forem solicitados: membro consulta o feedback e envia nova versão (D4).
+6. Quando todos os itens do bloco estão concluídos ou aprovados, o bloco é concluído e o
+   membro conquista o título do bloco (D32, D42).
+7. Com todos os blocos concluídos e a entrega geral aprovada, a trilha é concluída e concede
+   o XP de conclusão (D32, D41).
 
 ## Fluxo D: revisão compartilhada
 1. Revisor abre a fila.
@@ -61,25 +64,29 @@ Casos de erro: token inválido, expirado, revogado ou usado; e-mail da conta dif
 5. Revisor conclui a revisão ou libera a submissão.
 6. Gerência monitora a idade das submissões e pode liberar ou reatribuir submissões paradas (D19). Não há prazo de revisão.
 
-## Fluxo E: gestão de conteúdo
-1. Responsável técnico ou gerente cria ou edita uma trilha (D23).
-2. Define módulos, atividades e pré-requisitos da trilha (D27).
-3. Define tipo, competências, critérios e XP de cada atividade.
+## Fluxo E: gestão de conteúdo (CRUD de trilhas)
+1. Responsável técnico ou gerente cria ou edita uma trilha e escolhe quais vínculos podem acessá-la e quais trilhas são pré-requisito (D23, D27, D43, D44).
+2. Cria e ordena os blocos, com o título que cada um concede (D42).
+3. Cria os itens de cada bloco (tipo, enunciado, links, critérios de aprovação, competências)
+   e a entrega geral da trilha. O XP vem da tabela por tipo, não do item (D41).
+   Define, no evento, a data de conclusão (prazo da trilha) e prazos opcionais por bloco (D31, D50).
+   Cria eventos da trilha, com nome, período e membros designados (D49).
 4. Salva como rascunho e pré-visualiza.
 5. Publica.
 6. O conteúdo fica disponível a membros sem alterar o histórico de atividades já realizadas (D26).
 
-## Fluxo F: visão gerencial
-1. Gerência seleciona trilha ou período.
-2. Consulta adoção, progresso, competências demonstradas e fila de revisão.
-3. Identifica atividades com baixa conclusão ou revisões paradas.
-4. Decide se ajusta conteúdo, critérios, carga de revisão ou apoio aos membros.
+## Fluxo F: acompanhamento (gerência e responsáveis técnicos)
+1. Gerência ou responsável técnico abre o dashboard e seleciona trilha ou período.
+2. Consulta a taxa de conclusão de cada evento de trilha, a fila de revisão e, por membro, nível, títulos, atividades entregues e andamento nas trilhas (RB-09, D48, D49).
+3. Identifica atividades com baixa conclusão, revisões paradas e membros com pouco avanço em relação ao evento da trilha (D47, D49).
+4. Decide se ajusta conteúdo, critérios, carga de revisão ou o apoio e o plano de ação de cada membro.
 
 ## Fluxo G: gestão de usuários e repasse de papéis
 1. Gerência abre a lista de usuários.
 2. Altera o papel de um usuário (por exemplo, para repassar gerência ou responsabilidade técnica à próxima leva, D21).
 3. Desativa a conta de quem deixou o núcleo ou reativa uma conta desativada (D9).
-4. O sistema impede alterar o próprio papel e rebaixar ou desativar o último gerente ativo (D29), e registra autor e data de cada mudança.
+4. Efetiva um trainee, alterando o vínculo para efetivado: ele passa a acessar todas as trilhas, com progresso, XP e títulos mantidos (D44).
+5. O sistema impede alterar o próprio papel e rebaixar ou desativar o último gerente ativo (D29), e registra autor e data de cada mudança.
 
 ## Fluxo H: recuperação de senha
 1. Usuário abre "Esqueci a senha" no login e informa o e-mail.

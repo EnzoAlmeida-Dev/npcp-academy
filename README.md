@@ -11,6 +11,8 @@ Stack: Next.js + TypeScript + Supabase (Auth/Postgres/RLS) + Tailwind, hospedado
 | [`AGENTS.md`](AGENTS.md) | Como o agente de código deve trabalhar neste repositório |
 | [`docs/product/PRD.md`](docs/product/PRD.md) | Visão, papéis, escopo, requisitos e regras de negócio |
 | [`docs/product/DECISIONS.md`](docs/product/DECISIONS.md) | Decisões de produto tomadas, suposições e itens em aberto |
+| [`docs/product/LEARNING_PATHS.md`](docs/product/LEARNING_PATHS.md) | Estrutura das trilhas, CRUD, XP e títulos |
+| [`docs/product/TERMS_AND_PRIVACY.md`](docs/product/TERMS_AND_PRIVACY.md) | Termos de uso e aviso de privacidade (fase de testes) |
 | [`docs/product/ACCEPTANCE_CRITERIA.md`](docs/product/ACCEPTANCE_CRITERIA.md) | Critérios verificáveis e testes negativos obrigatórios |
 | [`docs/product/USER_FLOWS.md`](docs/product/USER_FLOWS.md) | Fluxos e mapa de navegação por papel |
 | [`docs/architecture/SYSTEM_DESIGN.md`](docs/architecture/SYSTEM_DESIGN.md) | Arquitetura, organização do código, fluxos críticos e ambientes |

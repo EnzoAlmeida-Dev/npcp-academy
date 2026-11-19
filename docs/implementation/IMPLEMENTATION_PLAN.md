@@ -8,10 +8,10 @@ Estado atual de cada fase em `STATUS.md`. Referências `Dnn` apontam para `docs/
 | 1 | Fundação | Concluída | — |
 | 2 | Identidade e convites | Concluída | — |
 | 2b | Contas e qualidade | Concluída | D28, D29, D36, D37 |
-| 3 | Conteúdo e trilhas | Próxima | D23–D27; D32/D33 durante a fase |
-| 4 | Progresso e autodeclaração | Planejada | D10, D15, D24 |
+| 3 | Conteúdo e trilhas (CRUD) | Próxima | D27, D31, D33, D38–D40, D43–D45, D49, D50 |
+| 4 | Progresso e autodeclaração | Planejada | D10, D40, D41 |
 | 5 | Submissões e revisão | Planejada | D3, D4, D19, D25 |
-| 6 | Competências e gamificação | Planejada | D2, D11, D12, D16, D20; **D13, D14 abertas** |
+| 6 | Competências, XP, títulos e ranking | Planejada | D2, D11, D12, D16, D20, D41, D42; D13 e D14 (decididas) |
 | 7 | Painel gerencial | Planejada | — |
 | 8 | Endurecimento e lançamento | Planejada | D30, D34 |
 
@@ -35,16 +35,23 @@ Aceitação:
 - usuário não altera o próprio papel; último gerente protegido;
 - conta desativada perde acesso imediatamente.
 
-## Fase 3 — Conteúdo e trilhas
+## Fase 3 — Conteúdo e trilhas (CRUD)
+Especificação: `docs/product/LEARNING_PATHS.md`.
+
 Implementar:
-- esquema de trilhas, pré-requisitos, módulos, atividades, recursos e competências;
-- gestão de conteúdo por responsáveis técnicos e gerência, com rascunho/publicação/arquivamento;
-- catálogo e páginas de trilha, com indicação de bloqueio;
-- seed fictício de uma trilha piloto de desenvolvimento web.
+- vínculo trainee/efetivado nas contas e nos convites (D44);
+- esquema de trilhas (com vínculos de acesso), pré-requisitos, blocos, itens e competências;
+- CRUD completo para responsáveis técnicos e gerência: trilhas, blocos, itens, título de cada
+  bloco, entrega geral, público e pré-requisitos, com rascunho/publicação/arquivamento;
+- catálogo e página da trilha com blocos, itens e indicação de bloqueio;
+- eventos de trilha no CRUD: nome, período e membros designados (D49);
+- prazos no evento de trilha, com prazo opcional por bloco e sinalização de atraso (D31, D50);
+- seed apenas com dados fictícios no banco local, para desenvolvimento e testes. Nenhuma
+  trilha é criada em produção por script (D43).
 
 Aceitação:
-- AC-06 a AC-10, AC-47, AC-48;
-- membro vê apenas conteúdo publicado e não edita conteúdo;
+- AC-06 a AC-10, AC-47, AC-48, AC-54, AC-57 a AC-60, AC-64;
+- membro vê apenas conteúdo publicado do seu público e não edita conteúdo;
 - conteúdo pode ser atualizado sem apagar histórico.
 
 ## Fase 4 — Progresso e autodeclaração
@@ -76,20 +83,22 @@ Implementar:
 - correções de competência e de XP;
 - regras de níveis;
 - perfil individual;
+- tabela de XP por tipo (D41, D13), níveis (D14) e títulos por bloco (D42), exibidos no perfil, no ranking e nos painéis;
 - ranking geral, com ocultação de perfis pela gerência (D35).
 
 Aceitação:
-- AC-23 a AC-27, AC-31 a AC-33, AC-50, AC-52.
+- AC-23 a AC-27, AC-31 a AC-33, AC-50, AC-52, AC-55, AC-56.
 
 ## Fase 7 — Painel gerencial
 Implementar:
 - progresso agregado por trilha;
 - competências demonstradas;
 - fila e idade das submissões;
+- métricas de acompanhamento por membro (nível, títulos, atividades entregues, andamento nas trilhas) e taxa de conclusão por evento de trilha, nos dashboards da gerência e dos responsáveis técnicos e no painel de usuários (D48, RB-09);
 - filtros mínimos.
 
 Aceitação:
-- AC-35, AC-36;
+- AC-35, AC-36, AC-62, AC-63;
 - indicadores usam definições documentadas (`PRD.md` §10);
 - consultas não revelam dados além do necessário.
 
@@ -99,7 +108,7 @@ Implementar/verificar:
 - testes de autorização para todos os papéis;
 - acessibilidade e responsividade;
 - erros e logs;
-- exclusão de conta (D30) e termos/aviso de privacidade (D34);
+- exclusão de conta (D30) e aceite versionado dos termos e do aviso de privacidade (D34, AC-61), com texto revisado pelo jurídico;
 - seed de demonstração sem dados pessoais;
 - procedimento de backup e rollback.
 

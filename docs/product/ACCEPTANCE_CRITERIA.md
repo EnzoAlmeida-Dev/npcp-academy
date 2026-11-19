@@ -19,11 +19,12 @@ Cada critério deve ser validado por teste automatizado, teste manual documentad
 ## Trilhas e conteúdo
 - AC-06: Um membro vê apenas trilhas publicadas.
 - AC-07: Um responsável técnico ou gerente consegue criar, editar, salvar como rascunho e publicar uma trilha; um membro não consegue (D23).
-- AC-08: Uma trilha pode conter módulos e cada módulo pode conter atividades ordenadas.
+- AC-08: Uma trilha contém blocos ordenados, cada bloco contém itens ordenados, e a trilha tem uma entrega geral (D38).
 - AC-09: Uma atividade exibe instruções, tipo, critérios, links externos e competências associadas.
 - AC-10: Alterar uma atividade não apaga o histórico de progresso e submissões já existentes (D26).
 - AC-47: Uma trilha com pré-requisito não concluído aparece bloqueada, com o motivo, e o servidor rejeita iniciar suas atividades (D27).
-- AC-48: O modo de conclusão segue o tipo: conteúdo é autodeclarado; exercício, projeto e avaliação exigem revisão (D24).
+- AC-48: O modo de conclusão segue o tipo: vídeo é autodeclarado; questão aberta, entrega por link, entrega final do bloco e entrega geral da trilha exigem revisão (D40).
+- AC-54: Responsável técnico ou gerente cria, edita, ordena e arquiva trilhas, blocos e itens, define o título de cada bloco e o público da trilha; membro não acessa o CRUD (D43).
 
 ## Progresso e submissões
 - AC-11: Cada usuário mantém progresso independente por atividade.
@@ -55,14 +56,24 @@ Cada critério deve ser validado por teste automatizado, teste manual documentad
 - AC-29: Repetir a mesma requisição não duplica a recompensa.
 - AC-30: O cliente não pode determinar livremente valor, usuário destinatário ou evento de XP.
 - AC-31: Correção de pontuação gera transação corretiva com motivo e autor autorizado, que não pode ser o próprio destinatário (D16).
-- AC-32: Nível é calculado conforme limites documentados.
+- AC-32: Nível é calculado a partir do XP total pela tabela de limites documentada (D14); não há nível máximo nem teto de XP.
 - AC-33: Ranking é ordenado por XP, empates compartilham a posição e só exibe nome de exibição, nível e XP (D20).
 - AC-34: Recompensa de aprovação ocorre somente após a aprovação persistida com sucesso.
-- AC-51: Atividade não elegível (`xp_reward = 0`) não gera transação de XP (D15).
+- AC-51: O XP concedido por um item é o valor do seu tipo na tabela de XP do servidor, nunca um valor enviado pelo cliente (D41).
+- AC-57: Trainee não acessa trilhas que tenham a trilha trainee como pré-requisito até concluí-la; efetivado acessa todas as trilhas abertas ao seu vínculo; a regra é aplicada no servidor (D44).
+- AC-59: O evento de trilha aceita prazo (data de conclusão) e prazo próprio opcional por bloco, definidos e alterados no CRUD; o que está em atraso aparece sinalizado e continua aceitando envio; trilha sem evento não tem prazo; mudar um prazo não altera XP nem progresso (D31, D50).
+- AC-60: Todos os blocos publicados de uma trilha acessível à pessoa estão disponíveis desde o início, em qualquer ordem (D33).
+- AC-61: O primeiro acesso exige aceite da versão vigente dos termos e do aviso de privacidade, registrado com versão e data; uma nova versão exige novo aceite; ninguém registra aceite em nome de outra pessoa (D34).
+- AC-58: Apenas a gerência altera o vínculo de uma conta; a efetivação fica registrada e preserva progresso, XP e títulos (D44).
+- AC-55: Concluir um bloco concede o título do bloco uma única vez; repetir a requisição não duplica o título (D42).
+- AC-56: O ranking e o perfil exibem o título escolhido pela pessoa entre os que ela conquistou (D42).
 - AC-52: A gerência oculta um perfil do ranking; o perfil some do ranking para todos, a ação fica registrada e apenas a gerência pode desfazê-la (D35).
 
 ## Painel e implantação
 - AC-35: Gerência autorizada consegue consultar progresso agregado por trilha.
+- AC-62: Gerência e responsáveis técnicos veem, por membro, nível, títulos ganhos, atividades entregues por situação e andamento em cada trilha, conforme as definições de RB-09; membros não veem as métricas de outras pessoas (D48).
+- AC-63: Gerência e responsáveis técnicos veem, por evento de trilha, a taxa de conclusão (designados que concluíram ÷ designados), quantos concluíram no período e quantos iniciaram; contas ocultas do ranking ficam fora do cálculo (D48, D49).
+- AC-64: Responsável técnico ou gerente cria um evento de trilha com nome, data de início, data de conclusão posterior à de início e membros designados; só membros com acesso à trilha podem ser designados; membro comum não cria nem altera eventos (D49).
 - AC-36: Responsáveis conseguem ver a fila de revisão sem acessar dados além das permissões concedidas.
 - AC-37: Interface principal funciona em desktop e celular.
 - AC-38: Estados de carregamento, erro, vazio e sucesso são apresentados de forma compreensível.
@@ -78,6 +89,9 @@ Cada critério deve ser validado por teste automatizado, teste manual documentad
 - Usuário tenta alterar o próprio papel; gerente tenta rebaixar o último gerente.
 - Responsável técnico tenta corrigir o próprio XP ou competência.
 - Membro tenta iniciar atividade de trilha bloqueada.
+- Trainee tenta abrir, por URL direta, uma trilha restrita a efetivados.
+- Membro tenta alterar o próprio vínculo.
+- Membro tenta consultar as métricas de acompanhamento de outra pessoa.
 - Conta desativada tenta acessar com sessão ainda válida.
 - Duas requisições concorrentes tentam assumir a mesma revisão.
 - Uma requisição de recompensa é repetida.

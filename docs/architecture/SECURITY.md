@@ -43,7 +43,9 @@ Proteger contra:
 | Criar e revogar convites (D5) | | | ✓ |
 | Alterar papel, desativar e reativar contas de outras pessoas (D9, D21) | | | ✓ |
 | Ocultar perfis do ranking (D35) | | | ✓ |
-| Consultar dados individuais de outros membros e métricas agregadas | | | ✓ |
+| Criar e gerenciar eventos de trilha e designar membros (D49) | | ✓ | ✓ |
+| Ver métricas de acompanhamento dos membros e taxas de conclusão por evento (D48, RB-09) | | ✓ | ✓ |
+| Consultar e-mail, histórico de conta e demais dados individuais de outros membros | | | ✓ |
 
 Restrições que valem para todos os papéis:
 - Ninguém revisa a própria entrega nem corrige o próprio XP ou competência.

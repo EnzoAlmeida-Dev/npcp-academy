@@ -6,6 +6,8 @@ Construir uma plataforma web de capacitação técnica para membros e trainees d
 ## Fonte de verdade
 - Produto e escopo: `docs/product/PRD.md`
 - Decisões de produto, suposições e itens em aberto: `docs/product/DECISIONS.md`
+- Trilhas, blocos, XP, níveis e títulos: `docs/product/LEARNING_PATHS.md`
+- Termos de uso e privacidade: `docs/product/TERMS_AND_PRIVACY.md`
 - Critérios verificáveis: `docs/product/ACCEPTANCE_CRITERIA.md`
 - Fluxos e navegação por papel: `docs/product/USER_FLOWS.md`
 - Arquitetura: `docs/architecture/SYSTEM_DESIGN.md`

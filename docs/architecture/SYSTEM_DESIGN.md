@@ -41,7 +41,7 @@ Identity & Invitations · Profiles & Accounts · Learning Paths & Content · Act
 3. Impedir autoavaliação.
 4. Registrar decisão e feedback em `reviews`.
 5. Atualizar submissão, progresso e competências (D11).
-6. Criar transação de XP idempotente, se a atividade for elegível (D15).
+6. Criar transação de XP idempotente com o valor do tipo do item (D41) e, se o bloco ficar concluído, conceder o título (D42).
 7. Confirmar tudo na mesma transação.
 8. Retornar estado atualizado.
 
