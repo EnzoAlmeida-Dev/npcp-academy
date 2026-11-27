@@ -121,3 +121,38 @@ export async function setUserDisabledAction(
   revalidatePath("/admin/users");
   return { success: true };
 }
+
+const changeMembershipSchema = z.object({
+  user_id: z.uuid(),
+  membership: z.enum(["trainee", "efetivado"]),
+});
+
+/** Efetivacao e demais mudancas de vinculo (D44). Somente gerencia. */
+export async function changeUserMembershipAction(
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  if (!(await requireRole("manager"))) {
+    return { error: accountErrorMessage("not_authorized") };
+  }
+
+  const parsed = changeMembershipSchema.safeParse({
+    user_id: formData.get("user_id"),
+    membership: formData.get("membership"),
+  });
+  if (!parsed.success) {
+    return { error: accountErrorMessage("invalid_input") };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("set_user_membership", {
+    p_user_id: parsed.data.user_id,
+    p_membership: parsed.data.membership,
+  });
+
+  if (error) {
+    return { error: accountErrorMessage(error.message) };
+  }
+  revalidatePath("/admin/users");
+  return { success: true };
+}

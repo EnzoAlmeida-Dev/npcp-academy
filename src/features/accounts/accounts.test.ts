@@ -34,6 +34,9 @@ describe("accountErrorMessage", () => {
     expect(accountErrorMessage("cannot_change_own_role")).toMatch(
       /próprio papel/,
     );
+    expect(accountErrorMessage("cannot_change_own_membership")).toMatch(
+      /próprio vínculo/,
+    );
   });
 
   it("nao vaza mensagens desconhecidas", () => {

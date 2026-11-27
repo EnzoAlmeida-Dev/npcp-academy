@@ -3,6 +3,7 @@
 Documento vivo: atualizar ao concluir cada etapa. Serve para retomar o trabalho sem depender do histórico de conversa com o agente. Não contém segredos.
 
 - **Atualizado em:** 2026-11-05.
+- **Em andamento:** Fase 3 (conteúdo e trilhas). Etapa 3a (vínculo) pronta e verificada localmente; migração `20261119120000_membership` ainda **não aplicada na nuvem**. Próxima: 3b (esquema de conteúdo).
 - **Fases concluídas:** 1 (fundação), 2 (identidade e convites) e 2b (contas e qualidade, em produção). Ver `IMPLEMENTATION_PLAN.md`.
 
 ## Ambientes
@@ -29,7 +30,7 @@ Documento vivo: atualizar ao concluir cada etapa. Serve para retomar o trabalho 
 | `/profile` | Meu perfil: editar nome, ver e-mail e papel, alterar senha |
 | `/dashboard` | Boas-vindas e papel (conteúdo provisório) |
 | `/admin/invitations` | Gerência cria (link copiável) e revoga convites |
-| `/admin/users` | Gerência lista usuários, altera papel, desativa e reativa contas (com confirmação) |
+| `/admin/users` | Gerência lista usuários, altera papel e vínculo (efetivação), desativa e reativa contas (com confirmação) |
 
 Menu por papel em `src/lib/navigation.ts`; Trilhas, Competências e Revisões aparecem como "em breve".
 
@@ -45,6 +46,7 @@ Ver seção "Implementado" de `docs/architecture/DATA_MODEL.md`.
 | `20261017200000_fix_invitations_used_consistency` | CHECK de uso compatível com exclusão de usuário |
 | `20261018090000_admin_list_users` | RPC `list_users_for_admin` |
 | `20261103120000_account_management` | `account_events`, `set_display_name`, `get_my_account_status`, `change_user_role`, `set_user_disabled` |
+| `20261119120000_membership` | Vínculo trainee/efetivado em perfis e convites, `set_user_membership`, consumo de convite e lista de usuários com vínculo |
 
 ### UI
 Design system (base neutra, cor com função, progresso em chevrons, superfícies em camadas, ícones Lucide, estados de página, diálogo de confirmação). Ver `docs/design/DESIGN_SYSTEM.md`. O dashboard mostra só dados reais: primeiros passos para todos e, para a gerência, contas por status e papel e convites em aberto.
@@ -86,6 +88,7 @@ Revisão de UI/UX em 2026-11-03: foco visível em superfícies escuras, bordas d
 5. RLS de `profiles` só permite ler o próprio perfil (ou tudo, para gerência); fila e ranking exigirão leitura restrita de nomes (ver `DATA_MODEL.md`).
 
 ## Riscos
+- **Next.js 16.4.1 com vulnerabilidade conhecida (2026-11-20):** o `npm audit` aponta 7 avisos de severidade moderada (versões 16.0.0 a 16.4.4; correção em 16.4.6, que está fora da faixa fixada em `package.json`). Os avisos citam `use cache`, otimização de imagem com SVG, rotas Edge e aplicações autohospedadas; a aplicação não usa `use cache` nem rotas Edge, mas a exposição não foi avaliada em detalhe. Além disso, o `next build` e o `next dev` agora **param com erro (`SecurityFatalError`) em execuções alternadas** para mostrar a recomendação de upgrade; um ambiente limpo (CI, Vercel) pode falhar na primeira execução. Decidir o upgrade antes do próximo push.
 - **Desenvolvimento contra produção:** sem Supabase local rodando, `npm run dev` usa `.env.local`, que aponta para o projeto em nuvem de produção. Testes manuais e scripts podem criar dados reais. Mitigação: usar o Supabase local para desenvolvimento ou criar um projeto separado de dev.
 - `SUPABASE_SERVICE_ROLE_KEY` não é usada pela aplicação em execução; se estiver configurada no Vercel, pode ser removida.
 - Migração sempre antes do push na `main`: o Vercel publica a `main`, e código que depende de função ainda inexistente na nuvem quebra em produção.

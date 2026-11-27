@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
 import { SectionTitle } from "@/components/ui/section-title";
 import { DisplayNameForm } from "@/features/accounts/display-name-form";
+import { MEMBERSHIP_LABELS } from "@/lib/auth/membership";
 import { ROLE_LABELS } from "@/lib/auth/roles";
 import { getCurrentProfile } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
@@ -59,13 +60,15 @@ export default async function ProfilePage() {
 
       <Section
         title="Conta"
-        help="O e-mail e o papel vêm do convite. Para alterá-los, fale com a gerência."
+        help="O e-mail, o papel e o vínculo vêm do convite. Para alterá-los, fale com a gerência."
       >
         <dl className="grid gap-3 text-sm sm:grid-cols-[6rem_minmax(0,1fr)]">
           <dt className="text-muted">E-mail</dt>
           <dd className="break-words text-ink">{user?.email ?? "—"}</dd>
           <dt className="text-muted">Papel</dt>
           <dd className="text-ink">{ROLE_LABELS[profile.role]}</dd>
+          <dt className="text-muted">Vínculo</dt>
+          <dd className="text-ink">{MEMBERSHIP_LABELS[profile.membership]}</dd>
           <dt className="text-muted">Senha</dt>
           <dd>
             <Link

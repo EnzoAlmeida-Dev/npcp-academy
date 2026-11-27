@@ -15,6 +15,7 @@ import { generateInviteToken, hashToken, normalizeEmail } from "./token";
 const createInvitationSchema = z.object({
   email: z.string().email(),
   role: z.enum(["member", "reviewer", "manager"]),
+  membership: z.enum(["trainee", "efetivado"]),
 });
 
 export async function createInvitationAction(
@@ -29,9 +30,10 @@ export async function createInvitationAction(
   const parsed = createInvitationSchema.safeParse({
     email: formData.get("email"),
     role: formData.get("role"),
+    membership: formData.get("membership"),
   });
   if (!parsed.success) {
-    return { error: "Informe um e-mail válido e um papel autorizado." };
+    return { error: "Informe um e-mail válido, um papel e um vínculo." };
   }
 
   const token = generateInviteToken();
@@ -46,6 +48,7 @@ export async function createInvitationAction(
     email_normalized: normalizeEmail(parsed.data.email),
     token_hash: tokenHash,
     role: parsed.data.role,
+    membership: parsed.data.membership,
     expires_at: expiresAt,
     created_by: manager.id,
   });

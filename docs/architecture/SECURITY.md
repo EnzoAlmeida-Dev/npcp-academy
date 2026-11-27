@@ -41,7 +41,7 @@ Proteger contra:
 | Corrigir XP e competência de outras pessoas (D12, D16) | | ✓ | ✓ |
 | Liberar/reatribuir submissão assumida por outro revisor (D19) | | | ✓ |
 | Criar e revogar convites (D5) | | | ✓ |
-| Alterar papel, desativar e reativar contas de outras pessoas (D9, D21) | | | ✓ |
+| Alterar papel, vínculo (efetivação), desativar e reativar contas de outras pessoas (D9, D21, D44) | | | ✓ |
 | Ocultar perfis do ranking (D35) | | | ✓ |
 | Criar e gerenciar eventos de trilha e designar membros (D49) | | ✓ | ✓ |
 | Ver métricas de acompanhamento dos membros e taxas de conclusão por evento (D48, RB-09) | | ✓ | ✓ |
@@ -49,7 +49,7 @@ Proteger contra:
 
 Restrições que valem para todos os papéis:
 - Ninguém revisa a própria entrega nem corrige o próprio XP ou competência.
-- Ninguém altera o próprio papel nem desativa a própria conta; o último gerente ativo não pode ser rebaixado nem desativado (D29). Operações concorrentes são serializadas por bloqueio das linhas de gerentes.
+- Ninguém altera o próprio papel ou vínculo nem desativa a própria conta; o último gerente ativo não pode ser rebaixado nem desativado (D29). Operações concorrentes são serializadas por bloqueio das linhas de gerentes.
 - Usuário inativo ou desativado não tem papel efetivo (`current_profile_role()` retorna nulo).
 - Nenhum papel, `user_id`, XP ou status enviado pelo cliente é confiado sem verificação no servidor.
 

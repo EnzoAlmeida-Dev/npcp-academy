@@ -4,6 +4,7 @@ import { resolve } from "node:path";
 
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
+import type { Membership } from "@/lib/auth/membership";
 import type { Role } from "@/lib/auth/roles";
 import type { Database } from "@/types/database";
 
@@ -63,7 +64,12 @@ export type TestUser = { id: string; email: string; client: Client };
  */
 export async function createUser(
   role: Role = "member",
-  options: { activate?: boolean; displayName?: string | null; email?: string } = {},
+  options: {
+    activate?: boolean;
+    displayName?: string | null;
+    email?: string;
+    membership?: Membership;
+  } = {},
 ): Promise<TestUser> {
   const email = options.email ?? `it-${randomUUID()}@npcp.test`;
   const { data, error } = await admin.auth.admin.createUser({
@@ -81,6 +87,7 @@ export async function createUser(
       .from("profiles")
       .update({
         role,
+        membership: options.membership ?? "trainee",
         activated_at: new Date().toISOString(),
         display_name:
           options.displayName === undefined ? "Pessoa Teste" : options.displayName,

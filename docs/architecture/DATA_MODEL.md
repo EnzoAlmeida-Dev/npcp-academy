@@ -4,6 +4,9 @@ Referências `Dnn` apontam para `docs/product/DECISIONS.md`. A seção "Implemen
 
 ## Implementado
 
+### `membership` (enum)
+`trainee`, `efetivado` — vínculo da pessoa, independente do papel (D44).
+
 ### `user_role` (enum)
 `member`, `reviewer`, `manager` — hierarquia via `role_rank()` (D1).
 
@@ -13,6 +16,7 @@ Referências `Dnn` apontam para `docs/product/DECISIONS.md`. A seção "Implemen
 | `id` | uuid PK | = `auth.users.id`, `on delete cascade` |
 | `display_name` | text null | Obrigatório pela aplicação antes do uso (D28); nulo até ser definido |
 | `role` | `user_role` | default `member`; definido pelo convite |
+| `membership` | `membership` | default `trainee`; definido pelo convite e alterado só pela gerência (D44). Contas anteriores a 2026-11-19 viraram `efetivado` |
 | `activated_at` | timestamptz null | Preenchido ao consumir o convite |
 | `disabled_at` | timestamptz null | Conta desativada quando preenchido (D9) |
 | `created_at`, `updated_at` | timestamptz | `updated_at` por trigger |
@@ -28,6 +32,7 @@ Referências `Dnn` apontam para `docs/product/DECISIONS.md`. A seção "Implemen
 | `email_normalized` | text | CHECK: minúsculo e sem espaços |
 | `token_hash` | text unique | SHA-256 do token; o token bruto não é armazenado |
 | `role` | `user_role` | Papel concedido no consumo (D5) |
+| `membership` | `membership` | Vínculo concedido no consumo (D44); default `trainee` |
 | `expires_at` | timestamptz | CHECK: posterior a `created_at` |
 | `used_at`, `used_by` | timestamptz, uuid → profiles | CHECK: `used_by` exige `used_at` (`used_by` vira nulo se o usuário for excluído) |
 | `revoked_at` | timestamptz null | |
@@ -43,11 +48,12 @@ Referências `Dnn` apontam para `docs/product/DECISIONS.md`. A seção "Implemen
 | `consume_invitation(token_hash, user_id)` | Consumo atômico (`FOR UPDATE`), exige `user_id = auth.uid()`, e-mail igual e confirmado; idempotente só para o mesmo usuário |
 | `revoke_invitation(id)` | Gerência; só convites não usados |
 | `get_invitation_info(token_hash)` | `anon`/`authenticated`; e-mail, papel e estado do convite |
-| `list_users_for_admin()` | Gerência; perfis + e-mail de `auth.users` |
+| `list_users_for_admin()` | Gerência; perfis (com papel e vínculo) + e-mail de `auth.users` |
 | `set_display_name(name)` | Próprio usuário ativo (`auth.uid()`); 2–60 caracteres, sem espaços nas pontas (D28) |
 | `get_my_account_status()` | Próprio usuário, inclusive inativo/desativado: `activated`, `disabled` |
 | `change_user_role(user_id, role)` | Gerência; não altera o próprio papel nem conta não ativada; protege o último gerente (D29); registra evento |
 | `set_user_disabled(user_id, disabled)` | Gerência; não altera a própria conta; protege o último gerente; registra evento (D9) |
+| `set_user_membership(user_id, membership)` | Gerência; não altera o próprio vínculo nem conta não ativada; registra evento `membership_changed` (D44) |
 | `lock_managers_and_authorize()`, `other_active_managers(id)` | Internas: bloqueiam as linhas de gerentes e revalidam o chamador, para que operações concorrentes não deixem o sistema sem gerente |
 | `handle_new_user`, `set_updated_at` | Triggers |
 
@@ -56,8 +62,8 @@ Referências `Dnn` apontam para `docs/product/DECISIONS.md`. A seção "Implemen
 |---|---|---|
 | `id` | uuid PK | |
 | `user_id` | uuid → profiles | `on delete cascade` |
-| `event_type` | text | CHECK: `role_changed`, `disabled`, `reactivated` |
-| `old_value`, `new_value` | text null | Papéis anterior e novo em `role_changed` |
+| `event_type` | text | CHECK: `role_changed`, `disabled`, `reactivated`, `membership_changed` |
+| `old_value`, `new_value` | text null | Valores anterior e novo em `role_changed` e `membership_changed` |
 | `actor_id` | uuid → profiles | `on delete set null` |
 | `created_at` | timestamptz | |
 
@@ -81,10 +87,6 @@ Escrita apenas pelas funções `change_user_role` e `set_user_disabled`; sem UPD
 
 ### Conteúdo (Fase 3) — conforme `docs/product/LEARNING_PATHS.md`
 Conceitual; o nome e o tipo final das colunas são fixados na migração.
-
-- **Vínculo** (D44): `profiles.membership` (`trainee`, `efetivado`), alterável só pela
-  gerência, com evento `membership_changed` em `account_events`; também informado no convite
-  (`invitations.membership`).
 
 - **`learning_paths`**: `id`, `title`, `slug` unique, `description`, `allowed_memberships` (vínculos com acesso,
   conjunto não vazio de `trainee`/`efetivado`, D44), `status` (`draft`, `published`, `archived`), `sort_order`, `created_by`,

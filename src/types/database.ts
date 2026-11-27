@@ -92,6 +92,7 @@ export type Database = {
           email_normalized: string
           expires_at: string
           id: string
+          membership: Database["public"]["Enums"]["membership"]
           revoked_at: string | null
           role: Database["public"]["Enums"]["user_role"]
           token_hash: string
@@ -105,6 +106,7 @@ export type Database = {
           email_normalized: string
           expires_at: string
           id?: string
+          membership?: Database["public"]["Enums"]["membership"]
           revoked_at?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           token_hash: string
@@ -117,6 +119,7 @@ export type Database = {
           email_normalized?: string
           expires_at?: string
           id?: string
+          membership?: Database["public"]["Enums"]["membership"]
           revoked_at?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           token_hash?: string
@@ -147,6 +150,7 @@ export type Database = {
           disabled_at: string | null
           display_name: string | null
           id: string
+          membership: Database["public"]["Enums"]["membership"]
           role: Database["public"]["Enums"]["user_role"]
           updated_at: string
         }
@@ -157,6 +161,7 @@ export type Database = {
           disabled_at?: string | null
           display_name?: string | null
           id: string
+          membership?: Database["public"]["Enums"]["membership"]
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string
         }
@@ -166,6 +171,7 @@ export type Database = {
           disabled_at?: string | null
           display_name?: string | null
           id?: string
+          membership?: Database["public"]["Enums"]["membership"]
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string
         }
@@ -224,6 +230,7 @@ export type Database = {
           display_name: string
           email: string
           id: string
+          membership: Database["public"]["Enums"]["membership"]
           role: Database["public"]["Enums"]["user_role"]
         }[]
       }
@@ -242,8 +249,16 @@ export type Database = {
         Args: { p_disabled: boolean; p_user_id: string }
         Returns: boolean
       }
+      set_user_membership: {
+        Args: {
+          p_membership: Database["public"]["Enums"]["membership"]
+          p_user_id: string
+        }
+        Returns: Database["public"]["Enums"]["membership"]
+      }
     }
     Enums: {
+      membership: "trainee" | "efetivado"
       user_role: "member" | "reviewer" | "manager"
     }
     CompositeTypes: {
@@ -375,6 +390,7 @@ export const Constants = {
   },
   public: {
     Enums: {
+      membership: ["trainee", "efetivado"],
       user_role: ["member", "reviewer", "manager"],
     },
   },

@@ -21,7 +21,7 @@ Referências `Dnn` apontam para `DECISIONS.md`. A navegação apenas reflete as 
 | Fila de revisão | `/reviews` | reviewer | Planejada (Fase 5) |
 | Gestão de conteúdo | a definir | reviewer | Planejada (Fase 3) |
 | Convites | `/admin/invitations` | manager | Implementada |
-| Usuários | `/admin/users` | manager | Implementada (papel, desativar, reativar) |
+| Usuários | `/admin/users` | manager | Implementada (papel, vínculo, desativar, reativar) |
 | Painel gerencial | a definir | manager | Planejada (Fase 7) |
 
 ## Fluxo A: primeiro acesso

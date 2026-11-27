@@ -224,3 +224,79 @@ describe("set_display_name e perfil", () => {
     expect(admin).toBeDefined();
   });
 });
+
+describe("set_user_membership (D44)", () => {
+  it("gerente efetiva um trainee e o evento fica registrado com o autor", async () => {
+    const manager = await createUser("manager");
+    const trainee = await createUser("member", { membership: "trainee" });
+
+    const { data, error } = await manager.client.rpc("set_user_membership", {
+      p_user_id: trainee.id,
+      p_membership: "efetivado",
+    });
+    expect(error).toBeNull();
+    expect(data).toBe("efetivado");
+    expect((await profileOf(trainee.id))?.membership).toBe("efetivado");
+
+    const { data: events } = await manager.client
+      .from("account_events")
+      .select("event_type, old_value, new_value, actor_id")
+      .eq("user_id", trainee.id);
+    expect(events).toEqual([
+      {
+        event_type: "membership_changed",
+        old_value: "trainee",
+        new_value: "efetivado",
+        actor_id: manager.id,
+      },
+    ]);
+  });
+
+  it("membro e responsavel tecnico nao alteram vinculo", async () => {
+    const target = await createUser("member", { membership: "trainee" });
+    for (const role of ["member", "reviewer"] as const) {
+      const actor = await createUser(role);
+      const { error } = await actor.client.rpc("set_user_membership", {
+        p_user_id: target.id,
+        p_membership: "efetivado",
+      });
+      expect(error?.message).toContain("not_authorized");
+    }
+    expect((await profileOf(target.id))?.membership).toBe("trainee");
+  });
+
+  it("ninguem altera o proprio vinculo", async () => {
+    const manager = await createUser("manager", { membership: "efetivado" });
+    const { error } = await manager.client.rpc("set_user_membership", {
+      p_user_id: manager.id,
+      p_membership: "trainee",
+    });
+    expect(error?.message).toContain("cannot_change_own_membership");
+  });
+
+  it("nao altera vinculo de conta ainda nao ativada", async () => {
+    const manager = await createUser("manager");
+    const pending = await createUser("member", { activate: false });
+    const { error } = await manager.client.rpc("set_user_membership", {
+      p_user_id: pending.id,
+      p_membership: "efetivado",
+    });
+    expect(error?.message).toContain("user_not_activated");
+  });
+
+  it("membro nao altera o proprio vinculo pela tabela", async () => {
+    const trainee = await createUser("member", { membership: "trainee" });
+    await trainee.client
+      .from("profiles")
+      .update({ membership: "efetivado" })
+      .eq("id", trainee.id);
+    expect((await profileOf(trainee.id))?.membership).toBe("trainee");
+  });
+
+  it("lista de usuarios da gerencia traz o vinculo", async () => {
+    const manager = await createUser("manager");
+    const trainee = await createUser("member", { membership: "trainee" });
+    const { data } = await manager.client.rpc("list_users_for_admin");
+    expect(data?.find((u) => u.id === trainee.id)?.membership).toBe("trainee");
+  });
+});

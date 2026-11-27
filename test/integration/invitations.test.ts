@@ -12,15 +12,19 @@ const hash = (token: string) =>
 const inDays = (days: number) =>
   new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString();
 
-async function createInvitation(
-  options: { email: string; role?: "member" | "reviewer" | "manager"; expired?: boolean },
-) {
+async function createInvitation(options: {
+  email: string;
+  role?: "member" | "reviewer" | "manager";
+  membership?: "trainee" | "efetivado";
+  expired?: boolean;
+}) {
   const manager = await createUser("manager");
   const token = randomBytes(32).toString("base64url");
   const { error } = await manager.client.from("invitations").insert({
     email_normalized: options.email,
     token_hash: hash(token),
     role: options.role ?? "member",
+    membership: options.membership ?? "trainee",
     created_by: manager.id,
     ...(options.expired
       ? { created_at: inDays(-2), expires_at: inDays(-1) }
@@ -61,6 +65,20 @@ describe("convites (RLS)", () => {
 });
 
 describe("consume_invitation", () => {
+  it.each(["trainee", "efetivado"] as const)(
+    "aplica o vinculo %s definido no convite (D44)",
+    async (membership) => {
+      const invited = await createUser("member", { activate: false });
+      const token = await createInvitation({ email: invited.email, membership });
+      const { error } = await invited.client.rpc("consume_invitation", {
+        p_token_hash: hash(token),
+        p_user_id: invited.id,
+      });
+      expect(error).toBeNull();
+      expect((await profileOf(invited.id))?.membership).toBe(membership);
+    },
+  );
+
   it("convite valido ativa a conta com o papel do convite uma unica vez", async () => {
     const invited = await createUser("member", { activate: false });
     const token = await createInvitation({ email: invited.email, role: "reviewer" });

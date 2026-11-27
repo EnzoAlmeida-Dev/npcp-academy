@@ -8,6 +8,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { UserActions } from "@/features/accounts/user-actions";
 import { listUsersForAdmin, type AdminUser } from "@/features/profiles/queries";
 import { requireRole } from "@/lib/auth/authorize";
+import { MEMBERSHIP_LABELS } from "@/lib/auth/membership";
 import { ROLE_LABELS } from "@/lib/auth/roles";
 import { formatDate } from "@/lib/format";
 
@@ -39,7 +40,7 @@ export default async function AdminUsersPage() {
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Usuários"
-        description="Contas, papéis e status. Mudanças de papel e de status ficam registradas."
+        description="Contas, papéis, vínculos e status. Mudanças de papel, vínculo e status ficam registradas."
       />
 
       {users.length === 0 ? (
@@ -85,13 +86,14 @@ export default async function AdminUsersPage() {
                     </div>
                     {isSelf || !user.activated_at ? (
                       <span className="text-ui text-muted">
-                        {ROLE_LABELS[user.role]}
+                        {ROLE_LABELS[user.role]}, {MEMBERSHIP_LABELS[user.membership].toLowerCase()}
                       </span>
                     ) : (
                       <UserActions
                         userId={user.id}
                         name={name}
                         role={user.role}
+                        membership={user.membership}
                         disabled={user.disabled_at !== null}
                       />
                     )}

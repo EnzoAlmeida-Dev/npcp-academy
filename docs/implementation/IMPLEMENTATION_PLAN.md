@@ -8,7 +8,7 @@ Estado atual de cada fase em `STATUS.md`. Referências `Dnn` apontam para `docs/
 | 1 | Fundação | Concluída | — |
 | 2 | Identidade e convites | Concluída | — |
 | 2b | Contas e qualidade | Concluída | D28, D29, D36, D37 |
-| 3 | Conteúdo e trilhas (CRUD) | Próxima | D27, D31, D33, D38–D40, D43–D45, D49, D50 |
+| 3 | Conteúdo e trilhas (CRUD) | Em andamento (3a concluída localmente) | D27, D31, D33, D38–D40, D43–D45, D49, D50 |
 | 4 | Progresso e autodeclaração | Planejada | D10, D40, D41 |
 | 5 | Submissões e revisão | Planejada | D3, D4, D19, D25 |
 | 6 | Competências, XP, títulos e ranking | Planejada | D2, D11, D12, D16, D20, D41, D42; D13 e D14 (decididas) |
@@ -41,6 +41,9 @@ Especificação: `docs/product/LEARNING_PATHS.md`.
 Implementar:
 - vínculo trainee/efetivado nas contas e nos convites (D44);
 - esquema de trilhas (com vínculos de acesso), pré-requisitos, blocos, itens e competências;
+- **edição completa depois de criado**, inclusive em conteúdo publicado: textos, links de vídeo,
+  critérios, títulos de bloco, vínculos de acesso, pré-requisitos e ordem (pedido do responsável
+  do produto; D26: edição altera o mesmo registro e preserva o histórico);
 - CRUD completo para responsáveis técnicos e gerência: trilhas, blocos, itens, título de cada
   bloco, entrega geral, público e pré-requisitos, com rascunho/publicação/arquivamento;
 - catálogo e página da trilha com blocos, itens e indicação de bloqueio;

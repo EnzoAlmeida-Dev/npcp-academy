@@ -8,6 +8,7 @@ import { CreateInvitationForm } from "@/features/invitations/create-invitation-f
 import { listInvitations } from "@/features/invitations/queries";
 import { RevokeInvitationButton } from "@/features/invitations/revoke-invitation-button";
 import { requireRole } from "@/lib/auth/authorize";
+import { MEMBERSHIP_LABELS } from "@/lib/auth/membership";
 import { ROLE_LABELS } from "@/lib/auth/roles";
 import { formatDate } from "@/lib/format";
 
@@ -71,7 +72,8 @@ export default async function AdminInvitationsPage() {
                       {inv.email_normalized}
                     </p>
                     <p className="text-ui text-muted">
-                      {ROLE_LABELS[inv.role]}, criado em{" "}
+                      {ROLE_LABELS[inv.role]} (
+                      {MEMBERSHIP_LABELS[inv.membership].toLowerCase()}), criado em{" "}
                       {formatDate(inv.created_at)}, válido até{" "}
                       {formatDate(inv.expires_at)}
                     </p>
