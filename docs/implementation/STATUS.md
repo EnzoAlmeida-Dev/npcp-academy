@@ -88,7 +88,7 @@ Revisão de UI/UX em 2026-11-03: foco visível em superfícies escuras, bordas d
 5. RLS de `profiles` só permite ler o próprio perfil (ou tudo, para gerência); fila e ranking exigirão leitura restrita de nomes (ver `DATA_MODEL.md`).
 
 ## Riscos
-- **Next.js 16.4.1 com vulnerabilidade conhecida (2026-11-20):** o `npm audit` aponta 7 avisos de severidade moderada (versões 16.0.0 a 16.4.4; correção em 16.4.6, que está fora da faixa fixada em `package.json`). Os avisos citam `use cache`, otimização de imagem com SVG, rotas Edge e aplicações autohospedadas; a aplicação não usa `use cache` nem rotas Edge, mas a exposição não foi avaliada em detalhe. Além disso, o `next build` e o `next dev` agora **param com erro (`SecurityFatalError`) em execuções alternadas** para mostrar a recomendação de upgrade; um ambiente limpo (CI, Vercel) pode falhar na primeira execução. Decidir o upgrade antes do próximo push.
+- **Next.js:** atualizado de 16.4.1 para 16.4.6 (2026-11-27), que corrige os 7 avisos de segurança do `npm audit` (0 vulnerabilidades depois). O erro de build alternado (`SecurityFatalError`) não ocorreu em 4 execuções seguidas.
 - **Desenvolvimento contra produção:** sem Supabase local rodando, `npm run dev` usa `.env.local`, que aponta para o projeto em nuvem de produção. Testes manuais e scripts podem criar dados reais. Mitigação: usar o Supabase local para desenvolvimento ou criar um projeto separado de dev.
 - `SUPABASE_SERVICE_ROLE_KEY` não é usada pela aplicação em execução; se estiver configurada no Vercel, pode ser removida.
 - Migração sempre antes do push na `main`: o Vercel publica a `main`, e código que depende de função ainda inexistente na nuvem quebra em produção.
